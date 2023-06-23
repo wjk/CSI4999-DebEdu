@@ -16,4 +16,7 @@
 # Build data
 /build/
 
+# MySQL Workspace backup files
+*.mwb.bak
+
 # End of https://www.toptal.com/developers/gitignore/api/phpunit
