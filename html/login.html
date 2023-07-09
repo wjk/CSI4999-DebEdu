@@ -1,0 +1,91 @@
+<!DOCTYPE html> 
+<html>
+<head>
+    <title>Portal Login</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f2f2f2;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-container {
+            width: 300px;
+            padding: 16px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1); 
+        }
+
+        .login-container input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd; 
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            background-color: #5c6bc0; 
+            cursor: pointer;
+        }
+
+        .login-container button:hover {
+            background-color: #3f51b5;
+        }
+        .login-container label {
+            margin-right: 10px;
+        }
+
+        .login-container input[type="radio"] {
+            width: 20px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- login form -->
+        <form id="login-form">
+            <input type="text" id="username" name="username" placeholder="Username" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+
+            <!-- radio buttons for teacher and student -->
+            <input type="radio" id="teacher" name="role" value="teacher" required>
+            <label for="teacher">Teacher</label>
+            <input type="radio" id="student" name="role" value="student" required>
+            <label for="student">Student</label>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <script>
+        window.onload = function() {
+            document.getElementById('login-form').addEventListener('submit', function(event) {
+                // prevent form from submitting normally
+                event.preventDefault();
+
+                var role = document.querySelector('input[name="role"]:checked').value;
+                // redirect to the new page with role
+                if(role === "student"){
+                    window.location.href = "student.html";
+
+                }
+                if(role === "teacher"){
+                    window.location.href = "teacher.html";
+
+                }
+            });
+        };
+    </script>
+</body>
+</html>
