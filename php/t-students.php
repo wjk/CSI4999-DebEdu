@@ -1,3 +1,19 @@
+<?php
+session_start();
+
+$servername = "localhost";
+$username = "root";
+$password = "";  
+$dbname = "DebEdu";  
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+?>
 <!DOCTYPE html> 
 <html>
 <head>
@@ -66,18 +82,66 @@
             justify-content: center;
             gap: 5px;
         }
+        select {
+            font-size: 12px;
+            padding: 10px;
+            border: none;
+            background-color: #f8f8f8;
+            color: #444;
+            margin: 10px 0;
+            width: 150px;
+        }
     </style>
 </head>
 <body>
     <div class="choice-container">
         <h1 class ="header">Teacher Portal</h1>
-        <h3 class ="sub-header">Grade View</h3>
-        <table>
+        <h3 class ="sub-header">Students View</h3>
+        <select id="selection">
+            <option value="section-1">section 1</option>
+            <option value="section-2">section 2</option>
+            <option value="section-3">section 3</option>
+        </select>
+        <table id="section-1">
             <thead>
                 <tr>
-                    <th>Assignment</th>
-                    <th>Date</th>
-                    <th>Status</th>
+                    <th>Name-1</th>
+                    <th>Grade</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="name">inject</td>
+                    <td id="class">data</td>
+                    <td id="email">here</td>
+                    
+                </tr>
+            </tbody>
+        </table>
+        <table id="section-2" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Name-2</th>
+                    <th>Grade</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="name">inject</td>
+                    <td id="class">data</td>
+                    <td id="email">here</td>
+                    
+                </tr>
+            </tbody>
+        </table>
+        <table id="section-3" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Name-3</th>
+                    <th>Grade</th>
+                    <th>Email</th>
                 </tr>
             </thead>
             <tbody>
@@ -91,14 +155,17 @@
         </table>
         <div class="button-container">
         <button class="button" id = "back">Back</button>
-        <button class="button" id = "nas">+</button>
-        <button class="button" id = "egrade">Enter Grades</button>
     </div>
     </div>
     <script>
         window.onload = function() {
+            document.getElementById('selection').addEventListener('change', function() {
+            document.getElementById('section-1').style.display = this.value === 'section-1' ? 'table' : 'none';
+            document.getElementById('section-2').style.display = this.value === 'section-2' ? 'table' : 'none';
+            document.getElementById('section-3').style.display = this.value === 'section-3' ? 'table' : 'none';
+        });
             document.getElementById('back').addEventListener('click', function(event) {
-                window.location.href = "teacher.html";
+                window.location.href = "teacher.php";
             });
         };
     </script>

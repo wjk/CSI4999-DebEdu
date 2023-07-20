@@ -1,7 +1,23 @@
+<?php
+session_start();
+
+$servername = "localhost";
+$username = "root";
+$password = "";  
+$dbname = "DebEdu";  
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+?>
 <!DOCTYPE html> 
 <html>
 <head>
-    <title>Student Portal</title>
+    <title>Teacher Portal</title>
     <style>
         body {
             display: flex;
@@ -60,20 +76,24 @@
         .button:hover {
             background-color: #5c6bc0;
         }
-
-
+        .button-container{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="choice-container">
-        <h1 class ="header">Student Portal</h1>
-        <h3 class ="sub-header">Contact View</h3>
+        <h1 class ="header">Teacher Portal</h1>
+        <h3 class ="sub-header">Grade View</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Role</th>
-                    <th>Email</th>
+                    <th>Assignment</th>
+                    <th>Date</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -85,14 +105,16 @@
                 </tr>
             </tbody>
         </table>
+        <div class="button-container">
         <button class="button" id = "back">Back</button>
-
+        <button class="button" id = "nas">+</button>
+        <button class="button" id = "egrade">Enter Grades</button>
     </div>
-
+    </div>
     <script>
         window.onload = function() {
             document.getElementById('back').addEventListener('click', function(event) {
-                window.location.href = "student.html";
+                window.location.href = "teacher.php";
             });
         };
     </script>

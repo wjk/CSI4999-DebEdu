@@ -1,3 +1,19 @@
+<?php
+session_start();
+
+$servername = "localhost";
+$username = "root";
+$password = "";  
+$dbname = "DebEdu";  
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+?>
 <!DOCTYPE html> 
 <html>
 <head>
@@ -92,7 +108,7 @@
     <script>
         window.onload = function() {
             document.getElementById('back').addEventListener('click', function(event) {
-                window.location.href = "student.html";
+                window.location.href = "student.php";
             });
         };
     </script>

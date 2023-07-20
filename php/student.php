@@ -1,3 +1,27 @@
+<?php
+session_start();
+
+$servername = "localhost";
+$username = "root";
+$password = "";  
+$dbname = "DebEdu";  
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+
+}
+// Pull user from session
+if(isset($_SESSION["username"])) {
+    $username = $_SESSION["username"];
+} else {
+    header("Location: login.php");
+    exit;
+}
+?>
 <!DOCTYPE html> 
 <html>
 <head>
@@ -31,21 +55,11 @@
             font-size: 24px;
             font-weight: bold;
         }
-        .sub-header {
+        .header-2 {
             text-align: center;
-            margin-bottom: 5px;
             color: #5c6bc0;
             font-size: 12px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
+            font-weight: bold;
         }
         .button {
             font-size: 12px;
@@ -53,46 +67,36 @@
             color: white;
             border-radius: 10px;
             border: none;
-            width: 80px;
-            height: 40px;
-            margin-bottom: 10PX;
+            width: 120px;
+            height: 80px;
+            margin-bottom: 50PX;
         }
         .button:hover {
             background-color: #5c6bc0;
         }
-
 
     </style>
 </head>
 <body>
     <div class="choice-container">
         <h1 class ="header">Student Portal</h1>
-        <h3 class ="sub-header">Class View</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Course</th>
-                    <th>Teacher</th>
-                    <th>Grade</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td id="name">inject</td>
-                    <td id="class">data</td>
-                    <td id="email">here</td>
-                    
-                </tr>
-            </tbody>
-        </table>
-        <button class="button" id = "back">Back</button>
+        <h2 class ="header-2">Welcome, <?= $_SESSION["username"] ?></h1>
+        <button class="button" id = "grades">View Grades</button>
 
+        <button class="button" id = "contact">Class Roster</button>
+        <button class="button" id = "classes">Class Schedule</button>
     </div>
 
     <script>
         window.onload = function() {
-            document.getElementById('back').addEventListener('click', function(event) {
-                window.location.href = "student.html";
+            document.getElementById('grades').addEventListener('click', function(event) {
+                window.location.href = "s-grades.php";
+            });
+            document.getElementById('classes').addEventListener('click', function(event) {
+                window.location.href = "s-classes.php";
+            });
+            document.getElementById('contact').addEventListener('click', function(event) {
+                window.location.href = "s-contact.php";
             });
         };
     </script>

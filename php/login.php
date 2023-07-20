@@ -1,3 +1,35 @@
+<?php
+session_start();
+
+$servername = "localhost";
+$username = "root";
+$password = "";  
+$dbname = "DebEdu";  
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $role = $_POST["role"];
+    $username = $_POST["username"]; 
+
+    // store username in session
+    $_SESSION["username"] = $username;
+    // redirect based on role
+    if($role === "student"){
+        header("Location: student.php");
+    }
+    if($role === "teacher"){
+        header("Location: teacher.php");
+    }
+}
+?>
 <!DOCTYPE html> 
 <html>
 <head>
@@ -55,7 +87,7 @@
 <body>
     <div class="login-container">
         <!-- login form -->
-        <form id="login-form">
+        <form id="login-form" method="POST" action="login.php">
             <input type="text" id="username" name="username" placeholder="Username" required>
             <input type="password" id="password" name="password" placeholder="Password" required>
 
@@ -67,25 +99,5 @@
             <button type="submit">Login</button>
         </form>
     </div>
-
-    <script>
-        window.onload = function() {
-            document.getElementById('login-form').addEventListener('submit', function(event) {
-                // prevent form from submitting normally
-                event.preventDefault();
-
-                var role = document.querySelector('input[name="role"]:checked').value;
-                // redirect to the new page with role
-                if(role === "student"){
-                    window.location.href = "student.html";
-
-                }
-                if(role === "teacher"){
-                    window.location.href = "teacher.html";
-
-                }
-            });
-        };
-    </script>
 </body>
 </html>

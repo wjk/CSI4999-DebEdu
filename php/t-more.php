@@ -1,7 +1,23 @@
+<?php
+session_start();
+
+$servername = "localhost";
+$username = "root";
+$password = "";  
+$dbname = "DebEdu";  
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+?>
 <!DOCTYPE html> 
 <html>
 <head>
-    <title>Student Portal</title>
+    <title>Teacher Portal</title>
     <style>
         body {
             display: flex;
@@ -49,23 +65,14 @@
 </head>
 <body>
     <div class="choice-container">
-        <h1 class ="header">Student Portal</h1>
-        <button class="button" id = "grades">View Grades</button>
-
-        <button class="button" id = "contact">Class Roster</button>
-        <button class="button" id = "classes">Class Schedule</button>
+        <h1 class ="header">Teacher Portal</h1>
+        <button class="button" id = "back">Back</button>
     </div>
 
     <script>
         window.onload = function() {
-            document.getElementById('grades').addEventListener('click', function(event) {
-                window.location.href = "s-grades.html";
-            });
-            document.getElementById('classes').addEventListener('click', function(event) {
-                window.location.href = "s-classes.html";
-            });
-            document.getElementById('contact').addEventListener('click', function(event) {
-                window.location.href = "s-contact.html";
+            document.getElementById('back').addEventListener('click', function(event) {
+                window.location.href = "teacher.php";
             });
         };
     </script>

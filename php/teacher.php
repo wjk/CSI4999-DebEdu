@@ -1,3 +1,26 @@
+<?php
+session_start();
+
+$servername = "localhost";
+$username = "root";
+$password = "";  
+$dbname = "DebEdu";  
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+// Pull user from session
+if(isset($_SESSION["username"])) {
+    $username = $_SESSION["username"];
+} else {
+    header("Location: login.php");
+    exit;
+}
+?>
 <!DOCTYPE html> 
 <html>
 <head>
@@ -26,9 +49,15 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: -10px;
             color: #5c6bc0;
             font-size: 24px;
+            font-weight: bold;
+        }
+        .header-2 {
+            text-align: center;
+            color: #5c6bc0;
+            font-size: 12px;
             font-weight: bold;
         }
         .button {
@@ -50,6 +79,7 @@
 <body>
     <div class="choice-container">
         <h1 class ="header">Teacher Portal</h1>
+        <h2 class ="header-2">Welcome, <?= $_SESSION["username"] ?></h1>
         <button class="button" id = "grades">Submit Grades</button>
 
         <button class="button" id = "students">Students</button>
@@ -59,13 +89,13 @@
     <script>
         window.onload = function() {
             document.getElementById('grades').addEventListener('click', function(event) {
-                window.location.href = "t-grades.html";
+                window.location.href = "t-grades.php";
             });
             document.getElementById('students').addEventListener('click', function(event) {
-                window.location.href = "t-students.html";
+                window.location.href = "t-students.php";
             });
             document.getElementById('more').addEventListener('click', function(event) {
-                window.location.href = "t-more.html";
+                window.location.href = "t-more.php";
             });
         };
     </script>
