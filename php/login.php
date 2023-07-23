@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("Multiple rows in user query");
         }
     } else if ($role === 'teacher') {
-        $stmt = $conn->prepare("SELECT USER_PASSWORD FROM STUDENT_USER WHERE USER_NAME = ?;");
+        $stmt = $conn->prepare("SELECT USER_PASSWORD FROM TEACHER_USER WHERE USER_NAME = ?;");
         $stmt->bind_param("s", $username);
         $stmt->bind_result($hashed_password);
         $stmt->execute();
@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (password_verify($password, $hashed_password)) {
                 $_SESSION["username"] = $username;
                 $_SESSION["role"] = $role;
-                header("Location: /debedu/student.php");
+                header("Location: /debedu/teacher.php");
                 exit;
             }
         } else if ($result->num_rows > 1) {
