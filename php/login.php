@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $login_valid = 0;
     if ($role === 'student') {
-        $stmt = $conn->prepare("SELECT USER_NAME, USER_PASSWORD FROM STUDENT_USER WHERE USER_NAME = ?;");
+        $stmt = $conn->prepare("SELECT USER_PASSWORD FROM STUDENT_USER WHERE USER_NAME = ?;");
         $stmt->bind_param("s", $username);
         $results = $stmt->execute();
 
@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $show_login_error = 1;
         }
     } else if ($role === 'teacher') {
-        $stmt = $conn->prepare("SELECT USER_NAME, USER_PASSWORD FROM TEACHER_USER WHERE USER_NAME = ?;");
+        $stmt = $conn->prepare("SELECT USER_PASSWORD FROM TEACHER_USER WHERE USER_NAME = ?;");
         $stmt->bind_param("s", $username);
         $results = $stmt->execute();
 
