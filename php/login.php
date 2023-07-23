@@ -23,6 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $hashed_password)) {
             $_SESSION["username"] = $username;
+            $_SESSION["role"] = $role;
             header("Location: /debedu/student.php");
             exit;
         } else {
@@ -39,6 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $hashed_password)) {
             $_SESSION["username"] = $username;
+            $_SESSION["role"] = $role;
             header("Location: /debedu/teacher.php");
             exit;
         } else {
