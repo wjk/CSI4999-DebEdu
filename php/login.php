@@ -16,38 +16,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($role === 'student') {
         $stmt = $conn->prepare("SELECT USER_PASSWORD FROM STUDENT_USER WHERE USER_NAME = ?;");
         $stmt->bind_param("s", $username);
-        $results = $stmt->execute();
-
         $stmt->bind_result($hashed_password);
-        $stmt->fetch();
+        $stmt->execute();
 
-        if (password_verify($password, $hashed_password)) {
-            $_SESSION["username"] = $username;
-            $_SESSION["role"] = $role;
-            header("Location: /debedu/student.php");
-            exit;
-        } else {
-            header("HTTP/1.1 401 Unauthorized");
-            $show_login_error = 1;
+        $result = $stmt->get_result();
+        if ($result->num_rows == 1) {
+            $values = $result->fetch_assoc();
+            $hashed_password = $values['USER_PASSWORD'];
+
+            if ($hashed_password == null) {
+                die("hashed_password is null");
+            }
+
+            if (password_verify($password, $hashed_password)) {
+                $_SESSION["username"] = $username;
+                $_SESSION["role"] = $role;
+                header("Location: /debedu/student.php");
+                exit;
+            }
+        } else if ($result->num_rows > 1) {
+            die("Multiple rows in user query");
         }
     } else if ($role === 'teacher') {
-        $stmt = $conn->prepare("SELECT USER_PASSWORD FROM TEACHER_USER WHERE USER_NAME = ?;");
+        $stmt = $conn->prepare("SELECT USER_PASSWORD FROM STUDENT_USER WHERE USER_NAME = ?;");
         $stmt->bind_param("s", $username);
-        $results = $stmt->execute();
-
         $stmt->bind_result($hashed_password);
-        $stmt->fetch();
+        $stmt->execute();
 
-        if (password_verify($password, $hashed_password)) {
-            $_SESSION["username"] = $username;
-            $_SESSION["role"] = $role;
-            header("Location: /debedu/teacher.php");
-            exit;
-        } else {
-            header("HTTP/1.1 401 Unauthorized");
-            $show_login_error = 1;
+        $result = $stmt->get_result();
+        if ($result->num_rows == 1) {
+            $values = $result->fetch_assoc();
+            $hashed_password = $values['USER_PASSWORD'];
+
+            if ($hashed_password == null) {
+                die("hashed_password is null");
+            }
+
+            if (password_verify($password, $hashed_password)) {
+                $_SESSION["username"] = $username;
+                $_SESSION["role"] = $role;
+                header("Location: /debedu/student.php");
+                exit;
+            }
+        } else if ($result->num_rows > 1) {
+            die("Multiple rows in user query");
         }
+    } else {
+        die("Unknown role: " . $role);
     }
+
+    header("HTTP/1.1 401 Unauthorized");
+    $show_login_error = 1;
 }
 ?>
 <!DOCTYPE html> 
