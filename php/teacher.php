@@ -75,6 +75,8 @@ if(isset($_SESSION["username"])) {
 
         <button class="button" id = "students">Students</button>
         <button class="button" id = "more">More</button>
+
+        <a href="logout.php">Log Out</a>
     </div>
 
     <script>
