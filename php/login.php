@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $hashed_password)) {
             $_SESSION["username"] = $username;
-            header("Location: student.php");
+            header("Location: /debedu/student.php");
             exit;
         } else {
             header("HTTP/1.1 401 Unauthorized");
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $hashed_password)) {
             $_SESSION["username"] = $username;
-            header("Location: teacher.php");
+            header("Location: /debedu/teacher.php");
             exit;
         } else {
             header("HTTP/1.1 401 Unauthorized");
