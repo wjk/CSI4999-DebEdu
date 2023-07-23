@@ -5,18 +5,46 @@ include('common/mysql-connect.php');
 $conn = connect_to_database();
 
 
+$show_login_error = 0;
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = $_POST["role"];
     $username = $_POST["username"]; 
+    $password = $_POST["password"];
 
-    // store username in session
-    $_SESSION["username"] = $username;
-    // redirect based on role
-    if($role === "student"){
-        header("Location: student.php");
-    }
-    if($role === "teacher"){
-        header("Location: teacher.php");
+    $login_valid = 0;
+    if ($role === 'student') {
+        $stmt = $conn->prepare("SELECT USER_NAME, USER_PASSWORD FROM STUDENT_USER WHERE USER_NAME = ?;");
+        $stmt->bind_param("s", $username);
+        $results = $stmt->execute();
+
+        $stmt->bind_result($hashed_password);
+        $stmt->fetch();
+
+        if (password_verify($password, $hashed_password)) {
+            $_SESSION["username"] = $username;
+            header("Location: student.php");
+            exit;
+        } else {
+            header("HTTP/1.1 401 Unauthorized");
+            $show_login_error = 1;
+        }
+    } else if ($role === 'teacher') {
+        $stmt = $conn->prepare("SELECT USER_NAME, USER_PASSWORD FROM TEACHER_USER WHERE USER_NAME = ?;");
+        $stmt->bind_param("s", $username);
+        $results = $stmt->execute();
+
+        $stmt->bind_result($hashed_password);
+        $stmt->fetch();
+
+        if (password_verify($password, $hashed_password)) {
+            $_SESSION["username"] = $username;
+            header("Location: teacher.php");
+            exit;
+        } else {
+            header("HTTP/1.1 401 Unauthorized");
+            $show_login_error = 1;
+        }
     }
 }
 ?>
@@ -33,6 +61,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: #f2f2f2;
             margin: 0;
             font-family: Arial, sans-serif;
+        }
+
+        .failure-box {
+            width: 300px;
+            padding: 16px;
+            margin-bottom: 32px;
+            background-color: salmon;
+            border-color: red;
+            border-radius: 8px;
         }
 
         .login-container {
@@ -75,6 +112,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
+    <?php if ($show_login_error) {?>
+        <div class="failure-box">
+            The username or password is not valid.
+        </div>
+    <?php } ?>
+
     <div class="login-container">
         <!-- login form -->
         <form id="login-form" method="POST" action="login.php">
