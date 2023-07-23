@@ -8,9 +8,20 @@ $conn = connect_to_database();
 $CORRECT_ADMIN_CODE = '61472147';
 
 
+$show_duplicate_error = 0;
 $show_code_failure = 0;
 $show_success = 0;
 $username = '';
+
+function is_user_defined($conn, $username, $is_student) {
+    $sql = $is_student ? "SELECT * FROM STUDENT_USER WHERE USER_NAME = ?;" : "SELECT * FROM TEACHER_USER WHERE USER_NAME = ?;";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return ($result->num_rows != 0);
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = $_POST["role"];
@@ -22,18 +33,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password_hash = password_hash($password, PASSWORD_ARGON2I);
 
         if ($role === 'student') {
-            $stmt = $conn->prepare("INSERT INTO STUDENT_USER(USER_NAME, USER_PASSWORD) VALUES (?, ?);");
-            $stmt->bind_param("ss", $username, $password_hash);
-            $stmt->execute();
+            if (is_user_defined($conn, $username, 1)) {
+                $show_duplicate_error = 1;
+            } else {
+                $stmt = $conn->prepare("INSERT INTO STUDENT_USER(USER_NAME, USER_PASSWORD) VALUES (?, ?);");
+                $stmt->bind_param("ss", $username, $password_hash);
+                $stmt->execute();
+
+                $show_success = 1;
+            }
         } else if ($role === 'teacher') {
-            $stmt = $conn->prepare("INSERT INTO TEACHER_USER(USER_NAME, USER_PASSWORD) VALUES (?, ?);");
-            $stmt->bind_param("ss", $username, $password_hash);
-            $stmt->execute();
+            if (is_user_defined($conn, $username, 0)) {
+                $show_duplicate_error = 1;
+            } else {
+                $stmt = $conn->prepare("INSERT INTO TEACHER_USER(USER_NAME, USER_PASSWORD) VALUES (?, ?);");
+                $stmt->bind_param("ss", $username, $password_hash);
+                $stmt->execute();
+
+                $show_success = 1;
+            }
         } else {
             die("Unknown role: " . $role);
         }
-
-        $show_success = 1;
     } else {
         $show_code_failure = 1;
     }
@@ -116,6 +137,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
+    <?php if ($show_duplicate_error) {?>
+        <div class="failure-box">
+            That user name is already in use.
+        </div>
+    <?php } ?>
     <?php if ($show_code_failure) {?>
         <div class="failure-box">
             The secure administration code is incorrect.
