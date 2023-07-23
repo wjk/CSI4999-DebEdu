@@ -67,8 +67,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 300px;
             padding: 16px;
             margin-bottom: 32px;
-            background-color: lightgreen;
-            border-color: darkgreen;
+            background-color: salmon;
+            border-color: red;
             border-radius: 8px;
         }
 
