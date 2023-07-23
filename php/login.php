@@ -1,18 +1,8 @@
 <?php
 session_start();
 
-$servername = "localhost";
-$username = "root";
-$password = "";  
-$dbname = "DebEdu";  
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
+include('common/mysql-connect.php');
+$conn = connect_to_database();
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
