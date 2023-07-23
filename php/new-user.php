@@ -19,15 +19,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $code = $_POST["admincode"];
 
     if ($code == $CORRECT_ADMIN_CODE) {
-        $show_code_failure = 1;
-    } else {
         $password_hash = password_hash($password, PASSWORD_ARGON2I);
 
         if ($role === 'student') {
             $stmt = $conn->prepare("INSERT INTO STUDENT_USER(USER_NAME, USER_PASSWORD) VALUES (?, ?);");
             $stmt->bind_param("ss", $username, $password_hash);
             $stmt->execute();
-        } else if (role === 'teacher') {
+        } else if ($role === 'teacher') {
             $stmt = $conn->prepare("INSERT INTO TEACHER_USER(USER_NAME, USER_PASSWORD) VALUES (?, ?);");
             $stmt->bind_param("ss", $username, $password_hash);
             $stmt->execute();
@@ -36,6 +34,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $show_success = 1;
+    } else {
+        $show_code_failure = 1;
     }
 }
 ?>
