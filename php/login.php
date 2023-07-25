@@ -12,57 +12,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST["username"]; 
     $password = $_POST["password"];
 
-    $login_valid = 0;
     if ($role === 'student') {
-        $stmt = $conn->prepare("SELECT USER_PASSWORD FROM STUDENT_USER WHERE USER_NAME = ?;");
-        $stmt->bind_param("s", $username);
-        $stmt->bind_result($hashed_password);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-        if ($result->num_rows == 1) {
-            $values = $result->fetch_assoc();
-            $hashed_password = $values['USER_PASSWORD'];
-
-            if ($hashed_password == null) {
-                die("hashed_password is null");
-            }
-
-            if (password_verify($password, $hashed_password)) {
-                $_SESSION["username"] = $username;
-                $_SESSION["role"] = $role;
-                header("Location: /debedu/student.php");
-                exit;
-            }
-        } else if ($result->num_rows > 1) {
-            die("Multiple rows in user query");
-        }
+        $table_name = "STUDENT_USER";
     } else if ($role === 'teacher') {
-        $stmt = $conn->prepare("SELECT USER_PASSWORD FROM TEACHER_USER WHERE USER_NAME = ?;");
-        $stmt->bind_param("s", $username);
-        $stmt->bind_result($hashed_password);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-        if ($result->num_rows == 1) {
-            $values = $result->fetch_assoc();
-            $hashed_password = $values['USER_PASSWORD'];
-
-            if ($hashed_password == null) {
-                die("hashed_password is null");
-            }
-
-            if (password_verify($password, $hashed_password)) {
-                $_SESSION["username"] = $username;
-                $_SESSION["role"] = $role;
-                header("Location: /debedu/teacher.php");
-                exit;
-            }
-        } else if ($result->num_rows > 1) {
-            die("Multiple rows in user query");
-        }
+        $table_name = "TEACHER_USER";
     } else {
         die("Unknown role: " . $role);
+    }
+
+    $stmt = $conn->prepare("SELECT USER_PASSWORD FROM " . $table_name . " WHERE USER_NAME = ?;");
+    $stmt->bind_param("s", $username);
+    $stmt->bind_result($hashed_password);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    if ($result->num_rows == 1) {
+        $values = $result->fetch_assoc();
+        $hashed_password = $values['USER_PASSWORD'];
+
+        if ($hashed_password == null) {
+            die("hashed_password is null");
+        }
+
+        if (password_verify($password, $hashed_password)) {
+            $_SESSION["username"] = $username;
+            $_SESSION["role"] = $role;
+            header("Location: /debedu/student.php");
+            exit;
+        }
+    } else if ($result->num_rows > 1) {
+        die("Multiple rows in user query");
     }
 
     header("HTTP/1.1 401 Unauthorized");
