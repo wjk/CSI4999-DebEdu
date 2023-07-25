@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (strlen($_SESSION["username"]) > 0) {
+if (array_key_exists("username", $_SESSION) && array_key_exists("role", $_SESSION)) {
     if ($_SESSION["role"] === 'student') {
         header("Location: /debedu/student.php");
     } else if ($_SESSION["role"] === 'teacher') {
