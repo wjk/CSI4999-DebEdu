@@ -3,6 +3,17 @@ session_start();
 
 include('common/mysql-connect.php');
 $conn = connect_to_database();
+
+// Ensure the user is a teacher
+if (isset($_SESSION["role"])) {
+    if ($_SESSION["role"] != 'teacher') {
+        header("Location: /debedu/student.php");
+        exit;
+    }
+} else {
+    header("Location: login.php");
+    exit;
+}
 ?>
 <!DOCTYPE html> 
 <html>

@@ -11,6 +11,17 @@ if(isset($_SESSION["username"])) {
     header("Location: login.php");
     exit;
 }
+
+// Ensure the user is a student
+if (isset($_SESSION["role"])) {
+    if ($_SESSION["role"] != 'student') {
+        header("Location: /debedu/teacher.php");
+        exit;
+    }
+} else {
+    header("Location: login.php");
+    exit;
+}
 ?>
 <!DOCTYPE html> 
 <html>
