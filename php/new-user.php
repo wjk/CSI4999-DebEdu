@@ -76,7 +76,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .success-box {
-            width: 300px;
             padding: 16px;
             margin-bottom: 32px;
             background-color: lightgreen;
@@ -85,7 +84,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .failure-box {
-            width: 300px;
             padding: 16px;
             margin-bottom: 32px;
             background-color: salmon;
@@ -137,6 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
+    <div class="login-container">
     <?php if ($show_duplicate_error) {?>
         <div class="failure-box">
             That user name is already in use.
@@ -152,7 +151,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     <?php } ?>
 
-    <div class="login-container">
         <!-- login form -->
         <form id="login-form" method="POST" action="new-user.php">
             <label for="username">New User Name:</label>
