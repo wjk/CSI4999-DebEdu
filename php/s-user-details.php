@@ -4,7 +4,18 @@ session_start();
 include('common/mysql-connect.php');
 $conn = connect_to_database();
 
-if (!isset($_SESSION["username"]) || !isset($_SESSION["role"])) {
+// Ensure the user is a student
+if (isset($_SESSION["role"])) {
+    if ($_SESSION["role"] != 'student') {
+        header("Location: /debedu/teacher.php");
+        exit;
+    }
+} else {
+    header("Location: login.php");
+    exit;
+}
+
+if (!isset($_SESSION["username"])) {
     header("Location: /debedu/login.php");
     exit;
 }
@@ -17,36 +28,19 @@ if ($user_name == '' || $user_type == '') {
     exit;
 }
 
-$user_table = '';
-if ($user_type == 'student') {
-    $user_table = "STUDENT_USER";
-} else if ($user_type == 'teacher') {
-    $user_table = "TEACHER_USER";
-} else {
-    die("Unknown user type: " . $user_type);
-}
-
 $show_success = 0;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $new_full_name = $_POST["fullname"];
 
-    $stmt = $conn->prepare("UPDATE " . $user_table . " SET REAL_NAME = ? WHERE USER_NAME = ?;");
+    $stmt = $conn->prepare("UPDATE STUDENT_USER SET REAL_NAME = ? WHERE USER_NAME = ?;");
     $stmt->bind_param("ss", $new_full_name, $user_name);
     $stmt->execute();
 
     $show_success = 1;
 }
 
-if ($user_type == 'student') {
-    $user_type_caps = 'Student';
-} else if ($user_type == 'teacher') {
-    $user_type_caps = 'Teacher';
-} else {
-    die("Unknown user type: " . $user_type);
-}
-
-function get_full_name($user_name, $conn, $user_table) {
-    $stmt = $conn->prepare("SELECT REAL_NAME FROM " . $user_table . " WHERE USER_NAME = ?;");
+function get_full_name($user_name, $conn) {
+    $stmt = $conn->prepare("SELECT REAL_NAME FROM STUDENT_USER WHERE USER_NAME = ?;");
     $stmt->bind_param("s", $user_name);
 
     $stmt->execute();
@@ -64,12 +58,12 @@ function get_full_name($user_name, $conn, $user_table) {
     return $values["REAL_NAME"];
 }
 
-$full_name = get_full_name($user_name, $conn, $user_table);
+$full_name = get_full_name($user_name, $conn);
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?php echo($user_type_caps) ?> Details</title>
+    <title>Student Details</title>
     <style>
         body {
             display: flex;
@@ -183,11 +177,11 @@ $full_name = get_full_name($user_name, $conn, $user_table);
                 </p>
             <?php } ?>
             <p>
-                You are a <span class="bold"><?php echo($user_type) ?>.</span>
+                You are a <span class="bold">student</span>.
             </p>
         </p>
-        <form id="user-form" method="POST" action="user-details.php">
-            <label for="fullname">New Full Name:</label>
+        <form id="user-form" method="POST" action="s-user-details.php">
+            <label for="fullname">New Real Name:</label>
             <input type="text" id="fullname" name="fullname" required>
 
             <button type="submit">Submit</button>
@@ -202,12 +196,7 @@ $full_name = get_full_name($user_name, $conn, $user_table);
         (function() {
         window.onload = function() {
             document.getElementById('back').addEventListener('click', function(event) {
-                /* test: <?php echo($user_type) ?> */
-                <?php if ($user_type == 'student') { ?>
-                    window.location.href = "student.php";
-                <? } else if ($user_type ==  'teacher') { ?>
-                    window.location.href = "teacher.php";
-                <?php } else { ?> debugger; <?php } ?>
+                window.location.href = "student.php";
            });
         };
         })();

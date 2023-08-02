@@ -87,7 +87,7 @@ if (isset($_SESSION["role"])) {
         <button class="button" id = "contact">Class Roster</button>
         <button class="button" id = "classes">Class Schedule</button>
 
-        <a href="user-details.php">Your Account</a><br>
+        <a href="s-user-details.php">Your Account</a><br>
         <a href="logout.php">Log Out</a>
     </div>
 
