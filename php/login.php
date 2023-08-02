@@ -64,7 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .failure-box {
-            width: 300px;
             padding: 16px;
             margin-bottom: 32px;
             background-color: salmon;
@@ -112,13 +111,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
+    <div class="login-container">
     <?php if ($show_login_error) {?>
         <div class="failure-box">
             The username or password is not valid.
         </div>
     <?php } ?>
 
-    <div class="login-container">
         <!-- login form -->
         <form id="login-form" method="POST" action="login.php">
             <input type="text" id="username" name="username" placeholder="Username" required>
