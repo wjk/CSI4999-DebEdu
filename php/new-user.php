@@ -36,8 +36,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (is_user_defined($conn, $username, 1)) {
                 $show_duplicate_error = 1;
             } else {
-                $stmt = $conn->prepare("INSERT INTO STUDENT_USER(USER_NAME, USER_PASSWORD) VALUES (?, ?);");
-                $stmt->bind_param("ss", $username, $password_hash);
+                $stmt = $conn->prepare("INSERT INTO STUDENT_USER(USER_NAME, USER_PASSWORD, REAL_NAME) VALUES (?, ?, ?);");
+                $stmt->bind_param("sss", $username, $password_hash, $username);
                 $stmt->execute();
 
                 $show_success = 1;
@@ -46,8 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (is_user_defined($conn, $username, 0)) {
                 $show_duplicate_error = 1;
             } else {
-                $stmt = $conn->prepare("INSERT INTO TEACHER_USER(USER_NAME, USER_PASSWORD) VALUES (?, ?);");
-                $stmt->bind_param("ss", $username, $password_hash);
+                $stmt = $conn->prepare("INSERT INTO TEACHER_USER(USER_NAME, USER_PASSWORD, REAL_NAME) VALUES (?, ?, ?);");
+                $stmt->bind_param("sss", $username, $password_hash, $username);
                 $stmt->execute();
 
                 $show_success = 1;
