@@ -162,8 +162,8 @@ function get_all_classmates($conn, $class_number) {
 </head>
 <body>
     <div class="choice-container">
-        <h1 class ="header">Student Portal</h1>
-        <h3 class ="sub-header">Contact View</h3>
+        <h1 class="header">Student Portal</h1>
+        <h3 class="sub-header">Contact View</h3>
         <table>
             <thead>
                 <tr>
