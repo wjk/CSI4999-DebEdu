@@ -4,6 +4,10 @@ session_start();
 include('common/mysql-connect.php');
 $conn = connect_to_database();
 
+if (!isset($_SESSION["username"])) {
+    header("Location: login.php");
+    exit;
+}
 
 // Ensure the user is a student
 if (isset($_SESSION["role"])) {
@@ -18,9 +22,9 @@ if (isset($_SESSION["role"])) {
 
 function get_real_name($conn, $user_name) {
     $stmt = $conn->prepare(
-        "SELECT STUDENT_USER.REAL_NAME " .
+        "SELECT STUDENT_USER.REAL_NAME AS REAL_NAME " .
         "FROM STUDENT_USER " .
-        "WHERE STUDENT_USER.USER_NUMBER = ?;"
+        "WHERE STUDENT_USER.USER_NAME = ?;"
     );
     $stmt->bind_param("s", $user_name);
 
@@ -93,6 +97,11 @@ function get_all_classmates($conn, $class_number) {
     }
     return $retval;
 }
+
+$user_name = $_SESSION["username"];
+$real_name = get_real_name($conn, $user_name);
+
+$classes = get_all_classes($conn, $user_name);
 ?>
 <!DOCTYPE html> 
 <html>
@@ -143,6 +152,9 @@ function get_all_classmates($conn, $class_number) {
             padding: 8px;
             text-align: left;
         }
+        th {
+            background-color: #EEEEEE;
+        }
         .button {
             font-size: 12px;
             background-color: #7885d1;
@@ -164,23 +176,37 @@ function get_all_classmates($conn, $class_number) {
     <div class="choice-container">
         <h1 class="header">Student Portal</h1>
         <h3 class="sub-header">Contact View</h3>
+
+        <?php
+        foreach ($classes as $class_number) {
+            $class_details = get_class_details($conn, $class_number);
+        ?>
+
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Role</th>
-                    <th>Email</th>
+                    <th>
+                        <b><?php echo($class_details['class_title']) ?></b><br>
+                        <?php echo($class_details['class_description']) ?>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Teacher: <?php echo($class_details['teacher_name']) ?>
+                    </th>
                 </tr>
             </thead>
+
             <tbody>
-                <tr>
-                    <td id="name">inject</td>
-                    <td id="class">data</td>
-                    <td id="email">here</td>
-                    
-                </tr>
+                <?php foreach (get_all_classmates($conn, $class_number) as $classmate_name) { ?>
+                    <tr>
+                        <td><?php echo($classmate_name) ?></td>
+                    </tr>
+                <?php } ?>
             </tbody>
         </table>
+        <?php } ?>
+
         <button class="button" id = "back">Back</button>
 
     </div>
