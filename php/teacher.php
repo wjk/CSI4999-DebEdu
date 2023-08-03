@@ -22,7 +22,24 @@ if (isset($_SESSION["role"])) {
     header("Location: login.php");
     exit;
 }
-?>
+
+function get_real_name($conn, $user_name) {
+    $stmt = $conn->prepare(
+        "SELECT TEACHER_USER.REAL_NAME AS REAL_NAME " .
+        "FROM TEACHER_USER " .
+        "WHERE TEACHER_USER.USER_NAME = ?;"
+    );
+    $stmt->bind_param("s", $user_name);
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $row = $result->fetch_assoc();
+    if (!isset($row["REAL_NAME"])) {
+        die("REAL_NAME for user " . $user_name . " not returned from database");
+    }
+    return $row["REAL_NAME"];
+}?>
 <!DOCTYPE html> 
 <html>
 <head>
@@ -81,7 +98,7 @@ if (isset($_SESSION["role"])) {
 <body>
     <div class="choice-container">
         <h1 class ="header">Teacher Portal</h1>
-        <h2 class ="header-2">Welcome, <?= $_SESSION["username"] ?></h1>
+        <h2 class ="header-2">Welcome, <?= get_real_name($conn, $_SESSION["username"]) ?></h1>
         <button class="button" id = "grades">Submit Grades</button>
 
         <button class="button" id = "students">Students</button>
