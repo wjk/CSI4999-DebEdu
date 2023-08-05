@@ -4,6 +4,11 @@ session_start();
 include('common/mysql-connect.php');
 $conn = connect_to_database();
 
+if (!isset($_SESSION["username"])) {
+    header("Location: login.php");
+    exit;
+}
+
 // Ensure the user is a student
 if (isset($_SESSION["role"])) {
     if ($_SESSION["role"] != 'student') {
@@ -13,6 +18,37 @@ if (isset($_SESSION["role"])) {
 } else {
     header("Location: login.php");
     exit;
+}
+function get_student_id($conn, $user_name) {
+    $stmt = $conn->prepare(
+        "SELECT USER_NUMBER " .
+        "FROM STUDENT_USER " .
+        "WHERE USER_NAME = ?;"
+    );
+    $stmt->bind_param("s", $user_name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    return $row["USER_NUMBER"];
+}
+
+function get_assignment_data($conn, $student_id) {
+    $stmt = $conn->prepare(
+        "SELECT EDU_CLASS.TITLE, ASSIGNMENT.ASSIGNMENT_NUMBER, ASSIGNMENT.CLASS_NUMBER, ASSIGNMENT_FOR_CLASS.GRADE, ASSIGNMENT_FOR_CLASS.SUBMISSION " .
+        "FROM ASSIGNMENT_FOR_CLASS " .
+        "INNER JOIN ASSIGNMENT ON ASSIGNMENT_FOR_CLASS.ASSIGNMENT_NUMBER = ASSIGNMENT.ASSIGNMENT_NUMBER " .
+        "INNER JOIN EDU_CLASS ON ASSIGNMENT.CLASS_NUMBER = EDU_CLASS.CLASS_NUMBER " .
+        "WHERE ASSIGNMENT_FOR_CLASS.STUDENT_NUMBER = ? " .
+        "ORDER BY ASSIGNMENT.CLASS_NUMBER, ASSIGNMENT.ASSIGNMENT_NUMBER;"
+    );
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $assignments = [];
+    while ($row = $result->fetch_assoc()) {
+        $assignments[] = $row;
+    }
+    return $assignments;
 }
 ?>
 <!DOCTYPE html> 
@@ -82,29 +118,35 @@ if (isset($_SESSION["role"])) {
     </style>
 </head>
 <body>
-    <div class="choice-container">
-        <h1 class ="header">Student Portal</h1>
-        <h3 class ="sub-header">Grade View</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Class</th>
-                    <th>Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td id="name">inject</td>
-                    <td id="class">data</td>
-                    <td id="email">here</td>
-                    
-                </tr>
-            </tbody>
-        </table>
-        <button class="button" id = "back">Back</button>
+<div class="choice-container">
+    <h1 class="header">Student Portal</h1>
+    <h3 class="sub-header">Grade View</h3>
 
-    </div>
+    <!-- Displaying class titles, descriptions, and grades -->
+    <table>
+    <thead>
+        <tr>
+            <th>Class Title</th>
+            <th>Assignment Number</th>
+            <th>Grade</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php 
+        $assignments_data = get_assignment_data($conn, get_student_id($conn, $_SESSION["username"]));
+        foreach ($assignments_data as $assignment) { ?>
+            <tr>
+                <td><?= $assignment["TITLE"] ?></td>
+                <td><?= $assignment["ASSIGNMENT_NUMBER"] ?></td>
+                <td><?= $assignment["GRADE"] ?></td>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>
+
+    <button class="button" id="back">Back</button>
+</div>
+
 
     <script>
         window.onload = function() {
