@@ -35,7 +35,7 @@ function get_student_id($conn, $user_name) {
 function get_assignment_data($conn, $student_id) {
     $stmt = $conn->prepare(
         "SELECT EDU_CLASS.TITLE, ASSIGNMENT.ASSIGNMENT_NUMBER, ASSIGNMENT.CLASS_NUMBER, ASSIGNMENT_FOR_CLASS.GRADE, " .
-        "CASE WHEN ASSIGNMENT_FOR_CLASS.SUBMISSION IS NULL THEN 'No' ELSE 'Yes' END AS 'Submission' " .
+        "CASE WHEN ASSIGNMENT_FOR_CLASS.SUBMISSION IS NULL THEN 'N' ELSE 'Y' END AS 'Submission' " .
         "FROM ASSIGNMENT_FOR_CLASS " .
         "INNER JOIN ASSIGNMENT ON ASSIGNMENT_FOR_CLASS.ASSIGNMENT_NUMBER = ASSIGNMENT.ASSIGNMENT_NUMBER " .
         "INNER JOIN EDU_CLASS ON ASSIGNMENT.CLASS_NUMBER = EDU_CLASS.CLASS_NUMBER " .
@@ -51,6 +51,19 @@ function get_assignment_data($conn, $student_id) {
     }
     return $assignments;
 }
+function get_assignment_number($conn, $student_id) {
+    $stmt = $conn->prepare(
+        "SELECT MAX(ASSIGNMENT_NUMBER) as max_num " .
+        "FROM ASSIGNMENT_FOR_CLASS " .
+        "WHERE STUDENT_NUMBER = ?;"
+    );
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    return $row["max_num"];
+}
+
 ?>
 <!DOCTYPE html> 
 <html>
@@ -129,7 +142,6 @@ function get_assignment_data($conn, $student_id) {
         <tr>
             <th>Title</th>
             <th>Number</th>
-            <th>Grade</th>
             <th>Submitted</th>
         </tr>
     </thead>
@@ -140,13 +152,25 @@ function get_assignment_data($conn, $student_id) {
             <tr>
                 <td><?= $assignment["TITLE"] ?></td>
                 <td><?= $assignment["ASSIGNMENT_NUMBER"] ?></td>
-                <td><?= $assignment["GRADE"] ?></td>
                 <td><?= $assignment["Submission"] ?></td>
             </tr>
-        <?php } ?>
+        <?php }
+        ?>
     </tbody>
 </table>
-
+    <select name="number"> 
+    <?php 
+        $max_number = get_assignment_number($conn, get_student_id($conn, $_SESSION["username"]));
+        for($i = 1; $i <= $max_number; $i++) {
+            echo "<option value=\"$i\">$i</option>";
+        }
+        ?>
+    </select>
+    <h3 class="sub-header">Select submission file:</h3>
+    
+    <input type="file" name="upload" id="upload">
+    <input type="submit" value="Submit" name="submit">
+</form>
     <button class="button" id="back">Back</button>
 </div>
 

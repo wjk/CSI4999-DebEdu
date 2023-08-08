@@ -104,6 +104,7 @@ function get_real_name($conn, $user_name) {
 
         <button class="button" id = "contact">Class Roster</button>
         <button class="button" id = "classes">Class Schedule</button>
+        <button class="button" id = "assignments">Assignments</button>
 
         <a href="s-user-details.php">Your Account</a><br>
         <a href="logout.php">Log Out</a>
@@ -119,6 +120,9 @@ function get_real_name($conn, $user_name) {
             });
             document.getElementById('contact').addEventListener('click', function(event) {
                 window.location.href = "s-contact.php";
+            });
+            document.getElementById('assignments').addEventListener('click', function(event) {
+                window.location.href = "s-assignment.php";
             });
         };
     </script>
