@@ -34,7 +34,7 @@ function get_student_id($conn, $user_name) {
 
 function get_class_data($conn, $student_id) {
     $stmt = $conn->prepare(
-        "SELECT EDU_CLASS.TITLE, STUDENT_IN_CLASS.GRADE, EDU_CLASS.DESCRIPTION " .
+        "SELECT EDU_CLASS.TITLE, STUDENT_IN_CLASS.GRADE, EDU_CLASS.DESCRIPTION, EDU_CLASS.CLASS_NUMBER " .
         "FROM STUDENT_IN_CLASS " .
         "INNER JOIN EDU_CLASS ON STUDENT_IN_CLASS.CLASS_NUMBER = EDU_CLASS.CLASS_NUMBER " .
         "WHERE STUDENT_IN_CLASS.STUDENT_NUMBER = ?;"
@@ -65,7 +65,6 @@ function get_class_data($conn, $student_id) {
         }
 
         .choice-container {
-            width: 300px;
             padding: 16px;
             background-color: white;
             border-radius: 8px;
@@ -137,6 +136,13 @@ function get_class_data($conn, $student_id) {
                     <td><?= $class_info["TITLE"] ?></td>
                     <td><?= $class_info["DESCRIPTION"] ?></td>
                     <td><?= $class_info["GRADE"] ?></td>
+                    <td>
+                        <form method="POST" target="messaging.php">
+                            <input type="hidden" name="action" value="read">
+                            <input type="hidden" name="class_number" value="<?= $class_info["CLASS_NUMBER"] ?>">
+                            <button type="submit">Chat</button>
+                        </form>
+                    </td>
                 </tr>
             <?php } ?>
         </tbody>
