@@ -28,6 +28,27 @@ if (isset($_POST["action"])) {
     $action = $_POST["action"];
 }
 
+function get_user_number($conn, $user_name, $role) {
+    $sql = '';
+    if ($role == 'teacher') {
+        $sql = 'SELECT USER_NUMBER FROM TEACHER_USER WHERE USER_NAME = ?;';
+    } else if ($role == 'student') {
+        $sql = 'SELECT USER_NUMBER FROM STUDENT_USER WHERE USER_NAME = ?;';
+    } else {
+        header("HTTP/1.1 500 Internal Server Error");
+        echo("Role '" . $role . "' not teacher or student");
+        exit;
+    }
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $user_name);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    return intval($row["USER_NUMBER"]);
+}
+
 $show_post_too_long_error = false;
 if ($action == 'delete') {
     if ($role != 'teacher') {
@@ -36,9 +57,28 @@ if ($action == 'delete') {
         exit;
     }
 
-    die("More here later...");
+    $stmt = $conn->prepare("DELETE FROM MESSAGE WHERE MESSAGE_NUMBER = ?;");
+    $stmt->bind_params("i", get_user_number($conn, $user_name));
+    $stmt->execute();
+
+    # Now continue rendering the page.
 } else if ($action == 'post') {
-    die("More here later...");
+    $role_table = '';
+    if ($role == 'teacher') $role_table = 'TEACHER_USER';
+    else if ($role == 'student') $role_table == 'STUDENT_USER';
+    else {
+        header("HTTP/1.1 500 Internal Server Error");
+        echo("Role '" . $role . "' not teacher or student");
+        exit;
+    }
+
+    $stmt = $conn->prepare(
+        "INSERT INTO MESSAGE (MESSAGE_TEXT, TIMESTAMP, CLASS_NUMBER, " . $role_table . ") VALUES (?, NOW(), ?, ?)"
+    );
+    $stmt->bind_param("ssi", $_POST["post_text"], $_POST["CLASS_NUMBER"], get_user_number($conn, $user_name));
+    $stmt->execute();
+
+    # Now continue rendering the page.
 }
 
 function get_messages($conn, $class_number, $is_teacher) {
