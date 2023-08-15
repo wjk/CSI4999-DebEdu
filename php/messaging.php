@@ -109,7 +109,7 @@ function get_messages($conn, $class_number, $is_teacher) {
             "WHERE EDU_CLASS.CLASS_NUMBER = ?;";
     }
 
-    $stmt = $conn->prepare($qsl);
+    $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $class_number);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -338,7 +338,7 @@ $sorted_messages = sort_messages($messages);
         </tbody>
     </table>
 
-    <form action="POST" target="messaging.php">
+    <form method="POST" action="messaging.php">
         <input type="hidden" name="action" value="post">
         <input type="hidden" name="class_number" value="<?= $class_number ?>">
         <p>
