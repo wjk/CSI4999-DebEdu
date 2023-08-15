@@ -315,11 +315,11 @@ $sorted_messages = sort_messages($messages);
                 <tr class="whole-width">
                     <td>
                         <p>
-                            <span class="bold"><?php echo($msg["poster"]) ?></span>
+                            <span class="bold"><?= $msg["poster"] ?></span>
                             <span class="timestamp">posted <?= $msg["date_string"] ?></span>
                         </p>
                         <p>
-                            <?php echo($msg["text"]) ?>
+                            <?= $msg["text"] ?>
                         </p>
                     </td>
 
@@ -328,7 +328,7 @@ $sorted_messages = sort_messages($messages);
                             <form action="POST" target="messaging.php">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="msgid" value="<?= $msg["msgid"] ?>">
-                                <input type="hidden" name="class_number" value="<?php echo($class_number) ?>">
+                                <input type="hidden" name="class_number" value="<?= $class_number ?>">
                                 <button type="submit">Delete Post</button>
                             </form>
                         </td>
