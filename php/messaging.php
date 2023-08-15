@@ -266,7 +266,7 @@ $sorted_messages = sort_messages($messages);
 <body>
 <div class="choice-container">
     <h1 class="header">Messaging</h1>
-    <h3 class="sub-header">For class “<?php echo($class_title) ?>”</h3>
+    <h3 class="sub-header">For class “<?= $class_title ?>”</h3>
 
     <table>
         <tbody>
@@ -276,7 +276,7 @@ $sorted_messages = sort_messages($messages);
                     <td>
                         <p>
                             <span class="bold"><?php echo($msg["poster"]) ?></span>
-                            <span class="timestamp">posted <?php echo($msg["date_string"]) ?></span>
+                            <span class="timestamp">posted <?= $msg["date_string"] ?></span>
                         </p>
                         <p>
                             <?php echo($msg["text"]) ?>
@@ -287,7 +287,7 @@ $sorted_messages = sort_messages($messages);
                         <td>
                             <form action="POST" target="messaging.php">
                                 <input type="hidden" name="action" value="delete">
-                                <input type="hidden" name="msgid" value="<?php echo($msg["msgid"]) ?>">
+                                <input type="hidden" name="msgid" value="<?= $msg["msgid"] ?>">
                                 <input type="hidden" name="class_number" value="<?php echo($class_number) ?>">
                                 <button type="submit">Delete Post</button>
                             </form>
@@ -300,7 +300,7 @@ $sorted_messages = sort_messages($messages);
 
     <form action="POST" target="messaging.php">
         <input type="hidden" name="action" value="post">
-        <input type="hidden" name="class_number" value="<?php echo($class_number) ?>">
+        <input type="hidden" name="class_number" value="<?= $class_number ?>">
         <p>
             <textarea class="whole-width" name="post_text">
         </p>
