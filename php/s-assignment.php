@@ -140,7 +140,7 @@ function get_assignment_number($conn, $student_id) {
     <table>
     <thead>
         <tr>
-            <th>Title</th>
+            <th>Class Title</th>
             <th>Number</th>
             <th>Submitted</th>
         </tr>
