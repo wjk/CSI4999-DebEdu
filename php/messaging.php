@@ -32,7 +32,7 @@ function get_user_number($conn, $user_name, $role) {
     $sql = '';
     if ($role == 'teacher') {
         $sql = 'SELECT USER_NUMBER FROM TEACHER_USER WHERE USER_NAME = ?;';
-    } elseif ($role == 'student') {
+    } else if ($role == 'student') {
         $sql = 'SELECT USER_NUMBER FROM STUDENT_USER WHERE USER_NAME = ?;';
     } else {
         header("HTTP/1.1 500 Internal Server Error");
@@ -72,29 +72,25 @@ if ($action == 'delete') {
     $stmt->execute();
 
     # Now continue rendering the page.
-} elseif ($action == 'post') {
-    $role_column = '';
-    if ($role == 'teacher') {
-        $role_column = 'TEACHER_USER_NUMBER';
-    }
-    elseif ($role == 'student') {
-        $role_column = 'STUDENT_USER_NUMBER';
-    }
+} else if ($action == 'post') {
+    $role_table = '';
+    if ($role == 'teacher') $role_table = 'TEACHER_USER';
+    else if ($role == 'student') $role_table == 'STUDENT_USER';
     else {
         header("HTTP/1.1 500 Internal Server Error");
         echo("Role '" . $role . "' not teacher or student");
         exit;
     }
-    if ($role_column == '') {
+    if ($role_table == '') {
         header("HTTP/1.1 500 Internal Server Error");
         echo("Role '" . $role . "' not recognized");
         exit;
     }
 
     $stmt = $conn->prepare(
-        "INSERT INTO MESSAGE (MESSAGE_TEXT, TIMESTAMP, CLASS_NUMBER, " . $role_column . ") VALUES (?, NOW(), ?, ?)"
+        "INSERT INTO MESSAGE (MESSAGE_TEXT, TIMESTAMP, CLASS_NUMBER, " . $role_table . ") VALUES (?, NOW(), ?, ?)"
     );
-    $stmt->bind_param("ssi", $_POST["post_text"], $_POST["class_number"], get_user_number($conn, $user_name, $role));
+    $stmt->bind_param("ssi", $_POST["post_text"], $_POST["CLASS_NUMBER"], get_user_number($conn, $user_name));
     $stmt->execute();
 
     # Now continue rendering the page.
@@ -137,7 +133,7 @@ function get_messages($conn, $class_number, $is_teacher) {
     while ($row = $result->fetch_assoc()) {
         $fields = [];
         $fields["msgid"] = $row["MESSAGE_NUMBER"];
-        $fields["timestamp"] = $row["TIMESTAMP"];
+        $fields["timestamp"] = $row["MESSAGE_TIMESTAMP"];
         $fields["text"] = $row["MESSAGE_TEXT"];
         $fields["poster"] = $row["USER_NAME"];
         $messages[] = $fields;
@@ -149,15 +145,15 @@ function get_messages($conn, $class_number, $is_teacher) {
 function safe_text_to_integer($string) {
     if ($string == "" || $string == null) {
         header("HTTP/1.1 500 Internal Server Error");
-        echo("String is null or of zero length");
-        exit;
+        die("String '" . $string . "' is not a valid integer");
+        return 0;
     }
 
     return intval($string);
 }
 
 function string_to_posix_time($string) {
-    preg_match("/(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)/u", $string, $timestamp_parts);
+    $timestamp_parts = preg_match("^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$", $string);
 
     $year = safe_text_to_integer($timestamp_parts[1]);
     $month = safe_text_to_integer($timestamp_parts[2]);
@@ -174,20 +170,20 @@ function string_to_posix_time($string) {
 
 function month_number_to_month_name($num) {
     if ($num == 1) return 'January';
-    elseif ($num == 2) return 'February';
-    elseif ($num == 3) return 'March';
-    elseif ($num == 4) return 'April';
-    elseif ($num == 5) return 'May';
-    elseif ($num == 6) return 'June';
-    elseif ($num == 7) return 'July';
-    elseif ($num == 8) return 'August';
-    elseif ($num == 9) return 'September';
-    elseif ($num == 10) return 'October';
-    elseif ($num == 11) return 'November';
-    elseif ($num == 12) return 'December';
+    else if ($num == 2) return 'February';
+    else if ($num == 3) return 'March';
+    else if ($num == 4) return 'April';
+    else if ($num == 5) return 'May';
+    else if ($num == 6) return 'June';
+    else if ($num == 7) return 'July';
+    else if ($num == 8) return 'August';
+    else if ($num == 9) return 'September';
+    else if ($num == 10) return 'October';
+    else if ($num == 11) return 'November';
+    else if ($num == 12) return 'December';
 
     header("HTTP/1.1 500 Internal Server Error");
-    echo("Month number '" . $num . "' not valid (expected 1-12)");
+    echo("Month number " . $num . " not valid (expected 1-12)");
     exit;
 }
 
@@ -196,7 +192,7 @@ function compare_message_timestamps($left, $right) {
     $right_time = $left['timestamp'];
     
     if ($left_time == $right_time) return 0;
-    elseif ($left_time < $right_time) return -1;
+    else if ($left_time < $right_time) return -1;
     else return 1;
 }
 
@@ -211,26 +207,22 @@ function sort_messages($messages) {
         $output_msg["timestamp"] = string_to_posix_time($input_msg["timestamp"]);
 
         $now = new DateTimeImmutable(); # defaults to current time
-
-        # DateTimeImmutable does not support initialization from a Unix timestamp
-        $posix_time = safe_text_to_integer($output_msg["timestamp"]);
-        $post_time = new DateTimeImmutable(date('Y-m-d H:i:s', $posix_time));
+        $post_time = new DateTimeImmutable($output_msg["timestamp"]);
 
         $user_date = '';
-        list($now_year, $now_month, $now_day) = sscanf($now->format("Y-m-d"), "%d-%d-%d");
-        list($post_year, $post_month, $post_day) = sscanf($post_time->format("Y-m-d"), "%d-%d-%d");
-
+        list($now_year, $now_month, $now_day) = sscanf($now->format("%Y-%m-%d"), "%d-%d-%d");
+        list($post_year, $post_month, $post_day) = sscanf($post_time->format("%Y-%m-%d"), "%d-%d-%d");
         if ($now_year == $post_year && $now_month == $post_month && $now_day = $post_day) {
             $user_date = 'today';
-        } elseif ($now_year == $post_year && $now_month == $post_month && $post_day == ($now_day - 1)) {
+        } else if ($now_year == $post_year && $now_month == $post_month && $post_day == ($now_day - 1)) {
             $user_date = 'yesterday';
-        } elseif ($now_year == $post_year) {
+        } else if ($now_year == $post_year) {
             $user_date = month_number_to_month_name($post_month) . ' ' . $post_day;
         } else {
             $user_date = month_number_to_month_name($post_month) . ' ' . $post_day . ', ' . $post_year;
         }
 
-        $user_time = $post_time->format("g:m A");
+        $user_time = $post_time->format("%g:%m %A");
         $output_msg["date_string"] = $user_date .  ' at ' . $user_time;
 
         $result[] = $output_msg;
@@ -339,8 +331,8 @@ $class_title = get_class_title($conn, $class_number);
         <tbody>
             <?php
             foreach ($sorted_messages as $msg) { ?>
-                <tr>
-                    <td class="whole-width">
+                <tr class="whole-width">
+                    <td>
                         <p>
                             <span class="bold"><?= $msg["poster"] ?></span>
                             <span class="timestamp">posted <?= $msg["date_string"] ?></span>
@@ -365,11 +357,11 @@ $class_title = get_class_title($conn, $class_number);
         </tbody>
     </table>
 
-    <form method="POST" action="messaging.php" class="whole-width">
+    <form method="POST" action="messaging.php">
         <input type="hidden" name="action" value="post">
         <input type="hidden" name="class_number" value="<?= $class_number ?>">
         <p>
-            <textarea class="whole-width" name="post_text" maxlength="2000" required rows="5"></textarea>
+            <textarea class="whole-width" name="post_text"></textarea>
         </p>
         <p>
             <button class="button" type="submit">Post</button>
