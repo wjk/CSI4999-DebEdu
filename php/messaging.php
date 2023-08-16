@@ -68,7 +68,7 @@ if ($action == 'delete') {
     }
 
     $stmt = $conn->prepare("DELETE FROM MESSAGE WHERE MESSAGE_NUMBER = ?;");
-    $stmt->bind_params("i", get_user_number($conn, $user_name));
+    $stmt->bind_param("i", $_POST["msgid"]);
     $stmt->execute();
 
     # Now continue rendering the page.
@@ -94,7 +94,7 @@ if ($action == 'delete') {
     $stmt = $conn->prepare(
         "INSERT INTO MESSAGE (MESSAGE_TEXT, TIMESTAMP, CLASS_NUMBER, " . $role_column . ") VALUES (?, NOW(), ?, ?)"
     );
-    $stmt->bind_params("ssi", $_POST["post_text"], $_POST["class_number"], get_user_number($conn, $user_name, $role));
+    $stmt->bind_param("ssi", $_POST["post_text"], $_POST["class_number"], get_user_number($conn, $user_name, $role));
     $stmt->execute();
 
     # Now continue rendering the page.
@@ -350,7 +350,7 @@ $class_title = get_class_title($conn, $class_number);
 
                     <?php if ($role == 'teacher') { ?>
                         <td>
-                            <form action="POST" target="messaging.php">
+                            <form method="POST" action="messaging.php">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="msgid" value="<?= $msg["msgid"] ?>">
                                 <input type="hidden" name="class_number" value="<?= $class_number ?>">
