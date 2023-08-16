@@ -331,8 +331,8 @@ $class_title = get_class_title($conn, $class_number);
         <tbody>
             <?php
             foreach ($sorted_messages as $msg) { ?>
-                <tr class="whole-width">
-                    <td>
+                <tr>
+                    <td class="whole-width">
                         <p>
                             <span class="bold"><?= $msg["poster"] ?></span>
                             <span class="timestamp">posted <?= $msg["date_string"] ?></span>
@@ -357,7 +357,7 @@ $class_title = get_class_title($conn, $class_number);
         </tbody>
     </table>
 
-    <form method="POST" action="messaging.php">
+    <form method="POST" action="messaging.php" class="whole-width">
         <input type="hidden" name="action" value="post">
         <input type="hidden" name="class_number" value="<?= $class_number ?>">
         <p>
