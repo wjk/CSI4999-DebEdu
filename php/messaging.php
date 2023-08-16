@@ -361,7 +361,7 @@ $class_title = get_class_title($conn, $class_number);
         <input type="hidden" name="action" value="post">
         <input type="hidden" name="class_number" value="<?= $class_number ?>">
         <p>
-            <textarea class="whole-width" name="post_text"></textarea>
+            <textarea class="whole-width" name="post_text" maxlength="2000" required rows="5"></textarea>
         </p>
         <p>
             <button class="button" type="submit">Post</button>
