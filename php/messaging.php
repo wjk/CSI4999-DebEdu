@@ -94,7 +94,9 @@ if ($action == 'delete') {
     $stmt = $conn->prepare(
         "INSERT INTO MESSAGE (MESSAGE_TEXT, TIMESTAMP, CLASS_NUMBER, " . $role_column . ") VALUES (?, NOW(), ?, ?)"
     );
-    $stmt->bind_param("ssi", $_POST["post_text"], $_POST["class_number"], get_user_number($conn, $user_name, $role));
+
+    $user_number = get_user_number($conn, $user_name, $role);
+    $stmt->bind_param("ssi", $_POST["post_text"], $_POST["class_number"], $user_number);
     $stmt->execute();
 
     # Now continue rendering the page.
@@ -340,7 +342,7 @@ $class_title = get_class_title($conn, $class_number);
                 <tr>
                     <td class="whole-width">
                         <p>
-                            <span class="bold"><?= $msg["poster"] ?></span>
+                            <span class="bold"><?= $msg["poster"] ?></span><br>
                             <span class="timestamp">posted <?= $msg["date_string"] ?></span>
                         </p>
                         <p>
