@@ -311,6 +311,9 @@ $class_title = get_class_title($conn, $class_number);
         .bold {
             font-weight: bold;
         }
+        textarea {
+            resize: vertical;
+        }
 
     </style>
 </head>
