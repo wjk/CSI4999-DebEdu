@@ -260,8 +260,6 @@ $class_title = get_class_title($conn, $class_number);
         body {
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
             background-color: #f2f2f2;
             margin: 0;
             font-family: Arial, sans-serif;
@@ -276,7 +274,7 @@ $class_title = get_class_title($conn, $class_number);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            margin: 10px;
         }
         .header {
             text-align: center;
