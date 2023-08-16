@@ -90,7 +90,7 @@ if ($action == 'delete') {
     $stmt = $conn->prepare(
         "INSERT INTO MESSAGE (MESSAGE_TEXT, TIMESTAMP, CLASS_NUMBER, " . $role_column . ") VALUES (?, NOW(), ?, ?)"
     );
-    $stmt->bind_param("ssi", $_POST["post_text"], $_POST["CLASS_NUMBER"], get_user_number($conn, $user_name));
+    $stmt->bind_param("ssi", $_POST["post_text"], $_POST["class_number"], get_user_number($conn, $user_name));
     $stmt->execute();
 
     # Now continue rendering the page.
