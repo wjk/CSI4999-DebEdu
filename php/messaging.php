@@ -81,6 +81,11 @@ if ($action == 'delete') {
         echo("Role '" . $role . "' not teacher or student");
         exit;
     }
+    if ($role_table == '') {
+        header("HTTP/1.1 500 Internal Server Error");
+        echo("Role '" . $role . "' not recognized");
+        exit;
+    }
 
     $stmt = $conn->prepare(
         "INSERT INTO MESSAGE (MESSAGE_TEXT, TIMESTAMP, CLASS_NUMBER, " . $role_table . ") VALUES (?, NOW(), ?, ?)"
