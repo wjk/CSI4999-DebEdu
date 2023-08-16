@@ -145,8 +145,8 @@ function get_messages($conn, $class_number, $is_teacher) {
 function safe_text_to_integer($string) {
     if ($string == "" || $string == null) {
         header("HTTP/1.1 500 Internal Server Error");
-        die("String '" . $string . "' is not a valid integer");
-        return 0;
+        echo("String '" . $string . "' is not a valid integer");
+        exit;
     }
 
     return intval($string);
