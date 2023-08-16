@@ -73,22 +73,22 @@ if ($action == 'delete') {
 
     # Now continue rendering the page.
 } else if ($action == 'post') {
-    $role_table = '';
-    if ($role == 'teacher') $role_table = 'TEACHER_USER';
-    else if ($role == 'student') $role_table == 'STUDENT_USER';
+    $role_column = '';
+    if ($role == 'teacher') $role_column = 'TEACHER_USER_NUMBER';
+    else if ($role == 'student') $role_column == 'STUDENT_USER_NUMBER';
     else {
         header("HTTP/1.1 500 Internal Server Error");
         echo("Role '" . $role . "' not teacher or student");
         exit;
     }
-    if ($role_table == '') {
+    if ($role_column == '') {
         header("HTTP/1.1 500 Internal Server Error");
         echo("Role '" . $role . "' not recognized");
         exit;
     }
 
     $stmt = $conn->prepare(
-        "INSERT INTO MESSAGE (MESSAGE_TEXT, TIMESTAMP, CLASS_NUMBER, " . $role_table . ") VALUES (?, NOW(), ?, ?)"
+        "INSERT INTO MESSAGE (MESSAGE_TEXT, TIMESTAMP, CLASS_NUMBER, " . $role_column . ") VALUES (?, NOW(), ?, ?)"
     );
     $stmt->bind_param("ssi", $_POST["post_text"], $_POST["CLASS_NUMBER"], get_user_number($conn, $user_name));
     $stmt->execute();
