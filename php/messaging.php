@@ -49,6 +49,16 @@ function get_user_number($conn, $user_name, $role) {
     return intval($row["USER_NUMBER"]);
 }
 
+function get_class_title($conn, $class_number) {
+    $stmt = $conn->prepare("SELECT TITLE FROM EDU_CLASS WHERE CLASS_NUMBER = ?;");
+    $stmt->bind_param("i", $class_number);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    return $row["TITLE"];
+}
+
 $show_post_too_long_error = false;
 if ($action == 'delete') {
     if ($role != 'teacher') {
@@ -226,6 +236,7 @@ if (!isset($_POST["class_number"])) {
 $class_number = $_POST["class_number"];
 $messages = array_merge(get_messages($conn, $class_number, true), get_messages($conn, $class_number, false));
 $sorted_messages = sort_messages($messages);
+$class_title = get_class_title($conn, $class_number);
 
 ?>
 <!DOCTYPE html> 
