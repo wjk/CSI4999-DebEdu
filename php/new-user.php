@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 $show_success = 1;
             }
-        } else if ($role === 'teacher') {
+        } elseif ($role === 'teacher') {
             if (is_user_defined($conn, $username, 0)) {
                 $show_duplicate_error = 1;
             } else {
@@ -145,7 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="failure-box">
             The secure administration code is incorrect.
         </div>
-    <?php } else if ($show_success) {?>
+    <?php } elseif ($show_success) {?>
         <div class="success-box">
             User <span class="bold"><?php $username ?></span> has been successfully created.
         </div>

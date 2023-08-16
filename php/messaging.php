@@ -32,7 +32,7 @@ function get_user_number($conn, $user_name, $role) {
     $sql = '';
     if ($role == 'teacher') {
         $sql = 'SELECT USER_NUMBER FROM TEACHER_USER WHERE USER_NAME = ?;';
-    } else if ($role == 'student') {
+    } elseif ($role == 'student') {
         $sql = 'SELECT USER_NUMBER FROM STUDENT_USER WHERE USER_NAME = ?;';
     } else {
         header("HTTP/1.1 500 Internal Server Error");
@@ -68,29 +68,35 @@ if ($action == 'delete') {
     }
 
     $stmt = $conn->prepare("DELETE FROM MESSAGE WHERE MESSAGE_NUMBER = ?;");
-    $stmt->bind_params("i", get_user_number($conn, $user_name));
+    $stmt->bind_param("i", $_POST["msgid"]);
     $stmt->execute();
 
     # Now continue rendering the page.
-} else if ($action == 'post') {
-    $role_table = '';
-    if ($role == 'teacher') $role_table = 'TEACHER_USER';
-    else if ($role == 'student') $role_table == 'STUDENT_USER';
+} elseif ($action == 'post') {
+    $role_column = '';
+    if ($role == 'teacher') {
+        $role_column = 'TEACHER_USER_NUMBER';
+    }
+    elseif ($role == 'student') {
+        $role_column = 'STUDENT_USER_NUMBER';
+    }
     else {
         header("HTTP/1.1 500 Internal Server Error");
         echo("Role '" . $role . "' not teacher or student");
         exit;
     }
-    if ($role_table == '') {
+    if ($role_column == '') {
         header("HTTP/1.1 500 Internal Server Error");
         echo("Role '" . $role . "' not recognized");
         exit;
     }
 
     $stmt = $conn->prepare(
-        "INSERT INTO MESSAGE (MESSAGE_TEXT, TIMESTAMP, CLASS_NUMBER, " . $role_table . ") VALUES (?, NOW(), ?, ?)"
+        "INSERT INTO MESSAGE (MESSAGE_TEXT, TIMESTAMP, CLASS_NUMBER, " . $role_column . ") VALUES (?, NOW(), ?, ?)"
     );
-    $stmt->bind_param("ssi", $_POST["post_text"], $_POST["CLASS_NUMBER"], get_user_number($conn, $user_name));
+
+    $user_number = get_user_number($conn, $user_name, $role);
+    $stmt->bind_param("ssi", $_POST["post_text"], $_POST["class_number"], $user_number);
     $stmt->execute();
 
     # Now continue rendering the page.
@@ -110,14 +116,14 @@ function get_messages($conn, $class_number, $is_teacher) {
     $sql = '';
     if ($is_teacher) {
         $sql =
-            "SELECT MESSAGE.MESSAGE_NUMBER, MESSAGE.MESSAGE_TEXT, MESSAGE.TIMESTAMP, TEACHER_USER.USER_NAME " .
+            "SELECT MESSAGE.MESSAGE_NUMBER, MESSAGE.MESSAGE_TEXT, MESSAGE.TIMESTAMP, TEACHER_USER.REAL_NAME " .
             "FROM MESSAGE " .
             "INNER JOIN EDU_CLASS ON EDU_CLASS.CLASS_NUMBER = MESSAGE.CLASS_NUMBER " .
             "INNER JOIN TEACHER_USER ON TEACHER_USER.USER_NUMBER = MESSAGE.TEACHER_USER_NUMBER " .
             "WHERE EDU_CLASS.CLASS_NUMBER = ?;";
     } else {
         $sql =
-            "SELECT MESSAGE.MESSAGE_NUMBER, MESSAGE.MESSAGE_TEXT, MESSAGE.TIMESTAMP, STUDENT_USER.USER_NAME " .
+            "SELECT MESSAGE.MESSAGE_NUMBER, MESSAGE.MESSAGE_TEXT, MESSAGE.TIMESTAMP, STUDENT_USER.REAL_NAME " .
             "FROM MESSAGE " .
             "INNER JOIN EDU_CLASS ON EDU_CLASS.CLASS_NUMBER = MESSAGE.CLASS_NUMBER " .
             "INNER JOIN STUDENT_USER ON STUDENT_USER.USER_NUMBER = MESSAGE.STUDENT_USER_NUMBER " .
@@ -133,9 +139,9 @@ function get_messages($conn, $class_number, $is_teacher) {
     while ($row = $result->fetch_assoc()) {
         $fields = [];
         $fields["msgid"] = $row["MESSAGE_NUMBER"];
-        $fields["timestamp"] = $row["MESSAGE_TIMESTAMP"];
+        $fields["timestamp"] = $row["TIMESTAMP"];
         $fields["text"] = $row["MESSAGE_TEXT"];
-        $fields["poster"] = $row["USER_NAME"];
+        $fields["poster"] = $row["REAL_NAME"];
         $messages[] = $fields;
     };
 
@@ -145,15 +151,15 @@ function get_messages($conn, $class_number, $is_teacher) {
 function safe_text_to_integer($string) {
     if ($string == "" || $string == null) {
         header("HTTP/1.1 500 Internal Server Error");
-        die("String '" . $string . "' is not a valid integer");
-        return 0;
+        echo("String is null or of zero length");
+        exit;
     }
 
     return intval($string);
 }
 
 function string_to_posix_time($string) {
-    $timestamp_parts = preg_match("^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$", $string);
+    preg_match("/(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)/u", $string, $timestamp_parts);
 
     $year = safe_text_to_integer($timestamp_parts[1]);
     $month = safe_text_to_integer($timestamp_parts[2]);
@@ -170,29 +176,29 @@ function string_to_posix_time($string) {
 
 function month_number_to_month_name($num) {
     if ($num == 1) return 'January';
-    else if ($num == 2) return 'February';
-    else if ($num == 3) return 'March';
-    else if ($num == 4) return 'April';
-    else if ($num == 5) return 'May';
-    else if ($num == 6) return 'June';
-    else if ($num == 7) return 'July';
-    else if ($num == 8) return 'August';
-    else if ($num == 9) return 'September';
-    else if ($num == 10) return 'October';
-    else if ($num == 11) return 'November';
-    else if ($num == 12) return 'December';
+    elseif ($num == 2) return 'February';
+    elseif ($num == 3) return 'March';
+    elseif ($num == 4) return 'April';
+    elseif ($num == 5) return 'May';
+    elseif ($num == 6) return 'June';
+    elseif ($num == 7) return 'July';
+    elseif ($num == 8) return 'August';
+    elseif ($num == 9) return 'September';
+    elseif ($num == 10) return 'October';
+    elseif ($num == 11) return 'November';
+    elseif ($num == 12) return 'December';
 
     header("HTTP/1.1 500 Internal Server Error");
-    echo("Month number " . $num . " not valid (expected 1-12)");
+    echo("Month number '" . $num . "' not valid (expected 1-12)");
     exit;
 }
 
 function compare_message_timestamps($left, $right) {
     $left_time = $left['timestamp'];
-    $right_time = $left['timestamp'];
+    $right_time = $right['timestamp'];
     
     if ($left_time == $right_time) return 0;
-    else if ($left_time < $right_time) return -1;
+    elseif ($left_time < $right_time) return -1;
     else return 1;
 }
 
@@ -207,22 +213,26 @@ function sort_messages($messages) {
         $output_msg["timestamp"] = string_to_posix_time($input_msg["timestamp"]);
 
         $now = new DateTimeImmutable(); # defaults to current time
-        $post_time = new DateTimeImmutable($output_msg["timestamp"]);
+
+        # DateTimeImmutable does not support initialization from a Unix timestamp
+        $posix_time = safe_text_to_integer($output_msg["timestamp"]);
+        $post_time = new DateTimeImmutable(date('Y-m-d H:i:s', $posix_time));
 
         $user_date = '';
-        list($now_year, $now_month, $now_day) = sscanf($now->format("%Y-%m-%d"), "%d-%d-%d");
-        list($post_year, $post_month, $post_day) = sscanf($post_time->format("%Y-%m-%d"), "%d-%d-%d");
-        if ($now_year == $post_year && $now_month == $post_month && $now_day = $post_day) {
+        list($now_year, $now_month, $now_day) = sscanf($now->format("Y-m-d"), "%d-%d-%d");
+        list($post_year, $post_month, $post_day) = sscanf($post_time->format("Y-m-d"), "%d-%d-%d");
+
+        if ($now_year == $post_year && $now_month == $post_month && $now_day == $post_day) {
             $user_date = 'today';
-        } else if ($now_year == $post_year && $now_month == $post_month && $post_day == ($now_day - 1)) {
+        } elseif ($now_year == $post_year && $now_month == $post_month && $post_day == ($now_day - 1)) {
             $user_date = 'yesterday';
-        } else if ($now_year == $post_year) {
+        } elseif ($now_year == $post_year) {
             $user_date = month_number_to_month_name($post_month) . ' ' . $post_day;
         } else {
             $user_date = month_number_to_month_name($post_month) . ' ' . $post_day . ', ' . $post_year;
         }
 
-        $user_time = $post_time->format("%g:%m %A");
+        $user_time = $post_time->format("g:m A");
         $output_msg["date_string"] = $user_date .  ' at ' . $user_time;
 
         $result[] = $output_msg;
@@ -252,8 +262,6 @@ $class_title = get_class_title($conn, $class_number);
         body {
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
             background-color: #f2f2f2;
             margin: 0;
             font-family: Arial, sans-serif;
@@ -268,7 +276,7 @@ $class_title = get_class_title($conn, $class_number);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            margin: 10px;
         }
         .header {
             text-align: center;
@@ -331,10 +339,10 @@ $class_title = get_class_title($conn, $class_number);
         <tbody>
             <?php
             foreach ($sorted_messages as $msg) { ?>
-                <tr class="whole-width">
-                    <td>
+                <tr>
+                    <td class="whole-width">
                         <p>
-                            <span class="bold"><?= $msg["poster"] ?></span>
+                            <span class="bold"><?= $msg["poster"] ?></span><br>
                             <span class="timestamp">posted <?= $msg["date_string"] ?></span>
                         </p>
                         <p>
@@ -344,7 +352,7 @@ $class_title = get_class_title($conn, $class_number);
 
                     <?php if ($role == 'teacher') { ?>
                         <td>
-                            <form action="POST" target="messaging.php">
+                            <form method="POST" action="messaging.php">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="msgid" value="<?= $msg["msgid"] ?>">
                                 <input type="hidden" name="class_number" value="<?= $class_number ?>">
@@ -357,11 +365,11 @@ $class_title = get_class_title($conn, $class_number);
         </tbody>
     </table>
 
-    <form method="POST" action="messaging.php">
+    <form method="POST" action="messaging.php" class="whole-width">
         <input type="hidden" name="action" value="post">
         <input type="hidden" name="class_number" value="<?= $class_number ?>">
         <p>
-            <textarea class="whole-width" name="post_text"></textarea>
+            <textarea class="whole-width" name="post_text" maxlength="2000" required rows="5"></textarea>
         </p>
         <p>
             <button class="button" type="submit">Post</button>

@@ -50,7 +50,7 @@ function get_full_name($user_name, $conn) {
     $result = $stmt->get_result();
     if ($result->num_rows == 0) {
         die("No user with name " . $user_name);
-    } else if ($result->num_rows > 1) {
+    } elseif ($result->num_rows > 1) {
         die("Duplicate users with name " . $user_name);
     }
 

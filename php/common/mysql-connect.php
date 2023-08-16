@@ -10,7 +10,9 @@ function connect_to_database() {
     $conn = new mysqli($servername, $username, $password, $dbname);
 
     if ($conn->connect_error) {
-        die("Connection failed: " . $conn->cnnect_error);
+        header("HTTP/1.1 500 Internal Server Error");
+        die("Failed to connect to database: " . $conn->connect_error);
+        exit;
     }
 
     return $conn;

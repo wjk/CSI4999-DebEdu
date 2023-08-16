@@ -99,6 +99,7 @@ function get_real_name($conn, $user_name) {
     <div class="choice-container">
         <h1 class ="header">Teacher Portal</h1>
         <h2 class ="header-2">Welcome, <?= get_real_name($conn, $_SESSION["username"]) ?></h1>
+        <button class="button" id = "classes">My Classes</button>
         <button class="button" id = "grades">Submit Grades</button>
 
         <button class="button" id = "students">Students</button>
@@ -110,6 +111,9 @@ function get_real_name($conn, $user_name) {
 
     <script>
         window.onload = function() {
+            document.getElementById('classes').addEventListener('click', function(event) {
+                window.location.href = "t-classes.php";
+            });
             document.getElementById('grades').addEventListener('click', function(event) {
                 window.location.href = "t-grades.php";
             });

@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($role === 'student') {
         $table_name = "STUDENT_USER";
-    } else if ($role === 'teacher') {
+    } elseif ($role === 'teacher') {
         $table_name = "TEACHER_USER";
     } else {
         die("Unknown role: " . $role);
@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: /debedu/student.php");
             exit;
         }
-    } else if ($result->num_rows > 1) {
+    } elseif ($result->num_rows > 1) {
         die("Multiple rows in user query");
     }
 
