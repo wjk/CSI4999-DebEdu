@@ -32,7 +32,7 @@ function get_teacher_id($conn, $user_name) {
     $row = $result->fetch_assoc();
     return $row["USER_NUMBER"];
 }
-
+// Get Semester information
 function get_semesters($conn, $teacher_id) {
     $stmt = $conn->prepare(
         "SELECT DISTINCT SEMESTER FROM EDU_CLASS WHERE TEACHER_NUMBER = ? ORDER BY SEMESTER DESC"
@@ -46,6 +46,7 @@ function get_semesters($conn, $teacher_id) {
     }
     return $semesters;
 }
+// Get name, email, Grade, title, and semester
 function get_student_data($conn, $teacher_id) {
     $stmt = $conn->prepare(
         "SELECT EDU_CLASS.TITLE, EDU_CLASS.SEMESTER, STUDENT_USER.EMAIL, STUDENT_USER.REAL_NAME, STUDENT_IN_CLASS.GRADE 
@@ -66,10 +67,28 @@ function get_student_data($conn, $teacher_id) {
     }
     return $assignments;
 }
+// Get all class titles for the semesters the teacher is teaching in
+function get_classes($conn, $teacher_id) {
+    $stmt = $conn->prepare( 
+        "SELECT TITLE , SEMESTER
+        FROM EDU_CLASS 
+        WHERE TEACHER_NUMBER = ?"
+    );
+    $stmt->bind_param("i", $teacher_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $classes = [];
+    while ($row = $result->fetch_assoc()) {
+        $classes[] = $row;
+    }
+    return $classes;
+}
 ?>
+
 <!DOCTYPE html> 
 <html>
 <head>
+    
     <title>Teacher Portal</title>
     <style>
         body {
@@ -147,9 +166,12 @@ function get_student_data($conn, $teacher_id) {
     </style>
 </head>
 <body>
+
+
     <div class="choice-container">
         <h1 class ="header">Teacher Portal</h1>
         <h3 class ="sub-header">Students View</h3>
+        <!-- Semester selection -->
     <select id="selection"onchange="filter();"><option value="All" selected>All</option>
     <?php
         // Call Function for array of semester associated with teacher ID
@@ -160,6 +182,7 @@ function get_student_data($conn, $teacher_id) {
         }
     ?>
 </select>
+<select id="classSelection" style="display:none;"></select>
         <table>
             <thead>
                 <tr>
@@ -190,10 +213,18 @@ function get_student_data($conn, $teacher_id) {
         <button class="button" id = "back">Back</button>
     </div>
     </div>
+
     <script>
+        // Get all classes associated with the teacher
+        var preloadedClass = <?php echo json_encode(get_classes($conn, get_teacher_id($conn, $_SESSION["username"]))); ?>;
+
         function filter() {
-            //Get selected semester
+            //Get selected semester and class selection
             var selectedSemester = document.getElementById('selection').value;
+            var classDropdown = document.getElementById('classSelection');
+            // Clear class drop down to re-enter values
+            classDropdown.innerHTML = '';
+
             //Get table data
             var rows = document.querySelectorAll('table tbody tr');
             //Loop through table data
@@ -208,6 +239,25 @@ function get_student_data($conn, $teacher_id) {
                     row.style.display = 'none';
                 }
             });
+            // If a semester is selected, we will show display the class dropdown, and filter to show unly classes within the semester.
+            if (selectedSemester != 'All') {
+                
+                console.log(preloadedClass);
+                var class_data = preloadedClass.filter(function(semester) {
+                    return semester.SEMESTER === selectedSemester;
+                });
+                console.log(class_data);
+                    class_data.forEach(function(row){
+                        var option = document.createElement('option');
+                        option.value = row.TITLE; 
+                        option.textContent = row.TITLE;
+                        classDropdown.appendChild(option);
+                    });
+                    classDropdown.style.display = '';
+                }
+                 else {
+                    classDropdown.style.display = 'none';
+                }
         }
     </script>
     <script>
@@ -217,5 +267,7 @@ function get_student_data($conn, $teacher_id) {
             });
         };
     </script>
+
+
 </body>
 </html>
