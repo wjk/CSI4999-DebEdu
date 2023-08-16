@@ -137,7 +137,7 @@ function get_class_data($conn, $student_id) {
                     <td><?= $class_info["DESCRIPTION"] ?></td>
                     <td><?= $class_info["GRADE"] ?></td>
                     <td>
-                        <form method="POST" target="messaging.php">
+                        <form method="POST" action="messaging.php">
                             <input type="hidden" name="action" value="read">
                             <input type="hidden" name="class_number" value="<?= $class_info["CLASS_NUMBER"] ?>">
                             <button type="submit">Chat</button>
