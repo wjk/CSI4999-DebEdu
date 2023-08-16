@@ -195,7 +195,7 @@ function month_number_to_month_name($num) {
 
 function compare_message_timestamps($left, $right) {
     $left_time = $left['timestamp'];
-    $right_time = $left['timestamp'];
+    $right_time = $right['timestamp'];
     
     if ($left_time == $right_time) return 0;
     elseif ($left_time < $right_time) return -1;
