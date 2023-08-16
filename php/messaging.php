@@ -114,14 +114,14 @@ function get_messages($conn, $class_number, $is_teacher) {
     $sql = '';
     if ($is_teacher) {
         $sql =
-            "SELECT MESSAGE.MESSAGE_NUMBER, MESSAGE.MESSAGE_TEXT, MESSAGE.TIMESTAMP, TEACHER_USER.USER_NAME " .
+            "SELECT MESSAGE.MESSAGE_NUMBER, MESSAGE.MESSAGE_TEXT, MESSAGE.TIMESTAMP, TEACHER_USER.REAL_NAME " .
             "FROM MESSAGE " .
             "INNER JOIN EDU_CLASS ON EDU_CLASS.CLASS_NUMBER = MESSAGE.CLASS_NUMBER " .
             "INNER JOIN TEACHER_USER ON TEACHER_USER.USER_NUMBER = MESSAGE.TEACHER_USER_NUMBER " .
             "WHERE EDU_CLASS.CLASS_NUMBER = ?;";
     } else {
         $sql =
-            "SELECT MESSAGE.MESSAGE_NUMBER, MESSAGE.MESSAGE_TEXT, MESSAGE.TIMESTAMP, STUDENT_USER.USER_NAME " .
+            "SELECT MESSAGE.MESSAGE_NUMBER, MESSAGE.MESSAGE_TEXT, MESSAGE.TIMESTAMP, STUDENT_USER.REAL_NAME " .
             "FROM MESSAGE " .
             "INNER JOIN EDU_CLASS ON EDU_CLASS.CLASS_NUMBER = MESSAGE.CLASS_NUMBER " .
             "INNER JOIN STUDENT_USER ON STUDENT_USER.USER_NUMBER = MESSAGE.STUDENT_USER_NUMBER " .
@@ -139,7 +139,7 @@ function get_messages($conn, $class_number, $is_teacher) {
         $fields["msgid"] = $row["MESSAGE_NUMBER"];
         $fields["timestamp"] = $row["TIMESTAMP"];
         $fields["text"] = $row["MESSAGE_TEXT"];
-        $fields["poster"] = $row["USER_NAME"];
+        $fields["poster"] = $row["REAL_NAME"];
         $messages[] = $fields;
     };
 
