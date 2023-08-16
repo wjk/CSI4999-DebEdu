@@ -48,6 +48,23 @@ function get_class_data($conn, $student_id) {
     }
     return $grades;
 }
+//Get Semester Data connected to Student Number for sorting
+function get_student_semesters($conn, $student_id) {
+    $stmt = $conn->prepare(
+        "SELECT DISTINCT EDU_CLASS.SEMESTER " .
+        "FROM STUDENT_IN_CLASS " .
+        "INNER JOIN EDU_CLASS ON STUDENT_IN_CLASS.CLASS_NUMBER = EDU_CLASS.CLASS_NUMBER " .
+        "WHERE STUDENT_IN_CLASS.STUDENT_NUMBER = ?;"
+    );
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $semesters = [];
+    while ($row = $result->fetch_assoc()) {
+        $semesters[] = $row['SEMESTER'];
+    }
+    return $semesters;
+}
 ?>
 <!DOCTYPE html> 
 <html>
@@ -120,12 +137,27 @@ function get_class_data($conn, $student_id) {
     <h3 class="sub-header">Grade View</h3>
 
     <!-- Displaying class titles, descriptions, and grades -->
+    <!-- Semester choice container -->
+    <div>
+        <label for="semesterSelect">Select Semester:</label>
+        <!-- All selection -->
+        <select id="semesterSelect" name="semester" onchange="filter();"><option value="All" selected>All</option>
+            <?php 
+            // Call Function for array of semester associated with student ID
+            $student_semesters = get_student_semesters($conn, get_student_id($conn, $_SESSION["username"]));
+            // Loop to create semester choice for each associacion made earlier
+            foreach ($student_semesters as $semester) { ?>
+                <option value="<?= $semester ?>"><?= $semester ?></option>
+            <?php } ?>
+        </select>
+    </div>
     <table>
         <thead>
             <tr>
                 <th>Title</th>
                 <th>Description</th>
                 <th>Grade</th>
+                <th>Semester</th>
             </tr>
         </thead>
         <tbody>
@@ -136,6 +168,7 @@ function get_class_data($conn, $student_id) {
                     <td><?= $class_info["TITLE"] ?></td>
                     <td><?= $class_info["DESCRIPTION"] ?></td>
                     <td><?= $class_info["GRADE"] ?></td>
+                    <td><?= $class_info["SEMESTER"] ?></td>
                     <td>
                         <form method="POST" action="messaging.php">
                             <input type="hidden" name="action" value="read">
@@ -150,7 +183,26 @@ function get_class_data($conn, $student_id) {
 
     <button class="button" id="back">Back</button>
 </div>
-
+    <script>
+        function filter() {
+            //Get selected semester
+            var selectedSemester = document.getElementById('semesterSelect').value;
+            //Get table data
+            var rows = document.querySelectorAll('table tbody tr');
+            //Loop through table data
+            rows.forEach(function(row) {
+                //Selects 'last-child' which is the semester column in each row
+                var semester = row.querySelector('td:nth-last-child(2)');
+                //Display all if all is selected or display only the rows that = the selected semester
+                if (selectedSemester === 'All' || semester.innerText === selectedSemester) {
+                    row.style.display = '';
+                    //Otherwise we do not display the row
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+    </script>
     <script>
         window.onload = function() {
             document.getElementById('back').addEventListener('click', function(event) {
