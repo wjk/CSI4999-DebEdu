@@ -31,11 +31,14 @@ if ($user_name == '' || $user_type == '') {
 $show_success = 0;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $new_full_name = $_POST["fullname"];
-
     $stmt = $conn->prepare("UPDATE STUDENT_USER SET REAL_NAME = ? WHERE USER_NAME = ?;");
     $stmt->bind_param("ss", $new_full_name, $user_name);
     $stmt->execute();
 
+    $new_email = $_POST["email"];
+    $stmt = $conn->prepare("UPDATE STUDENT_USER SET EMAIL = ? WHERE USER_NAME = ?;");
+    $stmt->bind_param("ss", $new_email, $user_name);
+    $stmt->execute();
     $show_success = 1;
 }
 
@@ -183,6 +186,8 @@ $full_name = get_full_name($user_name, $conn);
         <form id="user-form" method="POST" action="s-user-details.php">
             <label for="fullname">New Real Name:</label>
             <input type="text" id="fullname" name="fullname" required>
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required>
 
             <button type="submit">Submit</button>
         </form>
