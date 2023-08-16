@@ -220,7 +220,7 @@ function sort_messages($messages) {
         list($now_year, $now_month, $now_day) = sscanf($now->format("Y-m-d"), "%d-%d-%d");
         list($post_year, $post_month, $post_day) = sscanf($post_time->format("Y-m-d"), "%d-%d-%d");
 
-        if ($now_year == $post_year && $now_month == $post_month && $now_day = $post_day) {
+        if ($now_year == $post_year && $now_month == $post_month && $now_day == $post_day) {
             $user_date = 'today';
         } elseif ($now_year == $post_year && $now_month == $post_month && $post_day == ($now_day - 1)) {
             $user_date = 'yesterday';
