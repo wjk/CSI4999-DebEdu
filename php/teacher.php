@@ -118,7 +118,7 @@ function get_real_name($conn, $user_name) {
                 window.location.href = "t-students.php";
             });
             document.getElementById('assignments').addEventListener('click', function(event) {
-                window.location.href = "t-assignments.php";
+                window.location.href = "t-assignment.php";
             });
             document.getElementById('more').addEventListener('click', function(event) {
                 window.location.href = "t-more.php";
