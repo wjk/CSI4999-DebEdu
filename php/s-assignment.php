@@ -169,7 +169,7 @@ function get_assignment_number($conn, $student_id) {
     <h3 class="sub-header">Select submission file:</h3>
     <form action="upload.php" method="POST" enctype="multipart/form-data">
     <input type="file" name="file" id="upload">
-    <button type="submit" name="Submit">UPLOAD</button>
+    <button type="submit" name="submit">UPLOAD</button>
 </form>
     <button class="button" id="back">Back</button>
 </div>
