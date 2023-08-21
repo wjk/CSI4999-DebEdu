@@ -182,7 +182,8 @@ function get_classes($conn, $teacher_id) {
         }
     ?>
 </select>
-<select id="classSelection" style="display:none;"></select>
+<select id="classSelection"onchange="refilter();"style="display:none;"><option value="All" selected>All</option>
+</select>
         <table>
             <thead>
                 <tr>
@@ -223,7 +224,10 @@ function get_classes($conn, $teacher_id) {
             var selectedSemester = document.getElementById('selection').value;
             var classDropdown = document.getElementById('classSelection');
             // Clear class drop down to re-enter values
-            classDropdown.innerHTML = '';
+            var options = classDropdown.querySelectorAll('option');
+            for (var i = 1; i < options.length; i++) {  // Starting from index 1 to skip the first option ("ALL")
+                classDropdown.removeChild(options[i]);
+            }
 
             //Get table data
             var rows = document.querySelectorAll('table tbody tr');
@@ -241,8 +245,6 @@ function get_classes($conn, $teacher_id) {
             });
             // If a semester is selected, we will show display the class dropdown, and filter to show unly classes within the semester.
             if (selectedSemester != 'All') {
-                
-                console.log(preloadedClass);
                 var class_data = preloadedClass.filter(function(semester) {
                     return semester.SEMESTER === selectedSemester;
                 });
@@ -258,6 +260,29 @@ function get_classes($conn, $teacher_id) {
                  else {
                     classDropdown.style.display = 'none';
                 }
+        }
+
+        function refilter() {
+            var selectedSemester = document.getElementById('selection').value;
+            var selectedClass = document.getElementById('classSelection').value;
+            console.log(selectedClass);
+
+            //Get table data
+            var rows = document.querySelectorAll('table tbody tr');
+            //Loop through table data
+            rows.forEach(function(row) {
+                //Selects 'last-child' which is the semester column in each row
+                var semester = row.querySelector('td:last-child');
+                var classes = row.querySelector('td:nth-child(4)');
+                console.log(classes);
+                //Display all if all is selected or display only the rows that = the selected semester
+                if ((selectedClass === 'All' && semester.innerText === selectedSemester) || classes.innerText === selectedClass) {
+                    row.style.display = '';
+                    //Otherwise we do not display the row
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
     </script>
     <script>
