@@ -34,6 +34,12 @@ if (isset($_SESSION["role"]) && $_SESSION["role"] === 'teacher') {
         $classNumber = $_POST['classNumber'];
         $student = $_POST["studentNumber"];
 
+        if ($classNumber == null || $student == null) {
+            header("HTTP/1.1 500 Internal Server Error");
+            echo "Class number and/or student number is null";
+            exit;
+        }
+
         if (is_in_class($conn, $student, $classNumber)) {
             echo "That student is already in that class.";
         } else {
