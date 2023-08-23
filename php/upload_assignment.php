@@ -34,7 +34,8 @@ if (isset($_SESSION["role"]) && $_SESSION["role"] === 'teacher') {
         }
     }
 } else {
-    header("Location: login.php");
+    header("HTTP/1.1 403 Forbidden");
+    echo("You need to be a teacher to do this.");
     exit;
 }
 ?>
