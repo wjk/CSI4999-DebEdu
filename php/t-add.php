@@ -95,13 +95,16 @@ function get_teacher_id($conn, $user_name) {
         }
 
         .button {
-            font-size: 14px;
-            background-color: #5c6bc0;
+            font-size: 12px;
+            display: block;
+            background-color: #7885d1;
             color: white;
             border-radius: 10px;
             border: none;
-            width: 100%;
+            width: 80px;
             height: 40px;
+            margin-bottom: 10PX;
+            margin-top: 10PX;
         }
 
         .button:hover {
@@ -121,6 +124,8 @@ function get_teacher_id($conn, $user_name) {
 
             <input type="submit" value="Add to Class" class="button">
         </form>
+        <br>
+
         <div class="button-container">
         <button class="button" id = "back">Back</button>
     </div>
