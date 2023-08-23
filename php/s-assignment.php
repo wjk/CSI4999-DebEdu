@@ -51,6 +51,27 @@ function get_assignment_data($conn, $student_id) {
     }
     return $assignments;
 }
+
+function get_empty_assignments($conn, $student_id) {
+    $stmt = $conn->prepare(
+        "SELECT ASSIGNMENT.ASSIGNMENT_NUMBER, EDU_CLASS.TITLE " .
+        "FROM ASSIGNMENT " .
+        "INNER JOIN EDU_CLASS ON ASSIGNMENT.CLASS_NUMBER = EDU_CLASS.CLASS_NUMBER " .
+        "INNER JOIN STUDENT_IN_CLASS ON STUDENT_IN_CLASS.CLASS_NUMBER = EDU_CLASS.CLASS_NUMBER " .
+        "INNER JOIN STUDENT_USER ON STUDENT_USER.USER_NUMBER = STUDENT_IN_CLASS.STUDENT_NUMBER " .
+        "LEFT JOIN ASSIGNMENT_FOR_CLASS ON ASSIGNMENT_FOR_CLASS.ASSIGNMENT_NUMBER = ASSIGNMENT.ASSIGNMENT_NUMBER " .
+        "WHERE STUDENT_USER.USER_NUMBER = ? AND ASSIGNMENT_FOR_CLASS.SUBMISSION IS NULL;"
+    );
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $assignments = [];
+    while ($row = $result->fetch_assoc()) {
+        $assignments[] = $row;
+    }
+    return $assignments;
+}
+
 function get_assignment_number($conn, $student_id) {
     $stmt = $conn->prepare(
         "SELECT MAX(ASSIGNMENT_NUMBER) as max_num " .
@@ -162,6 +183,19 @@ $open_assigments = [];
                 $seen_open_assignment = true;
                 $open_assigments[] = $assignment;
             }
+        }
+
+        $empty_assignments = get_empty_assignments($conn, get_student_id($conn, $_SESSION["username"]));
+        foreach ($empty_assignments as $assignment) {
+            ?>
+            <tr>
+                <td><?= $assignment["TITLE"] ?></td>
+                <td><?= $assignment["ASSIGNMENT_NUMBER"] ?></td>
+                <td>N</td>
+            </tr>
+            <?php
+            $seen_open_assignment = true;
+            $open_assigments[] = $assignment;
         }
         ?>
     </tbody>
