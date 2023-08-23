@@ -18,9 +18,9 @@ if (isset($_SESSION["role"]) && $_SESSION["role"] === 'teacher') {
             $fileContent = file_get_contents($file);
 
             // Insert assignment into the database
-            $insertQuery = "INSERT INTO ASSIGNMENT (ASSIGNMENT_NUMBER,CLASS_NUMBER, DATE_POSTED, DOWNLOADABLE) VALUES (?, ?, ?)";
+            $insertQuery = "INSERT INTO ASSIGNMENT (ASSIGNMENT_NUMBER, CLASS_NUMBER, DATE_POSTED, DOWNLOADABLE) VALUES (?, ?, ?, ?)";
             $stmt = $conn->prepare($insertQuery);
-            $stmt->bind_param("iss",$assignmentNumber, $classNumber, $datePosted, $fileContent);
+            $stmt->bind_param("issb", $assignmentNumber, $classNumber, $datePosted, $fileContent);
 
             if ($stmt->execute()) {
                 echo "Assignment uploaded successfully!";
