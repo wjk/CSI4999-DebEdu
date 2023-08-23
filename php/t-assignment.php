@@ -123,7 +123,11 @@ function getNextAssignmentNumber($conn) {
             </select>
             <div class="form-label">Assignment Number:</div>
             <input type="text" name="assignmentNumber" value="<?php echo getNextAssignmentNumber($conn); ?>" readonly>
-
+            <div class="form-label">Assignment Title:</div>
+            <input type="text" name="assignmentTitle" required>
+            <div class="form-label">Assignment Description:</div>
+            <input type="text" name="assignmentDesc" required>
+            
             <div class="form-label">Upload Assignment:</div>
             <input type="file" name="file" required>
             <input type="submit" value="Upload Assignment" class="button">

@@ -12,15 +12,17 @@ if (isset($_SESSION["role"]) && $_SESSION["role"] === 'teacher') {
         $classNumber = $_POST["classNumber"];
         $datePosted = date("Y-m-d H:i:s");
         $file = $_FILES["file"]["tmp_name"];
+        $title = $_POST["assignmentTitle"];
+        $desc = $_POST["assignmentDesc"];
 
         if (!empty($file)) {
             // Read the file contents
             $fileContent = file_get_contents($file);
 
             // Insert assignment into the database
-            $insertQuery = "INSERT INTO ASSIGNMENT (ASSIGNMENT_NUMBER, CLASS_NUMBER, DATE_POSTED, DOWNLOADABLE) VALUES (?, ?, ?, ?)";
+            $insertQuery = "INSERT INTO ASSIGNMENT (ASSIGNMENT_NUMBER, TITLE, DESCRIPTION, CLASS_NUMBER, DATE_POSTED, DOWNLOADABLE) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($insertQuery);
-            $stmt->bind_param("issb", $assignmentNumber, $classNumber, $datePosted, $fileContent);
+            $stmt->bind_param("issssb", $assignmentNumber, $title, $desc, $classNumber, $datePosted, $fileContent);
 
             if ($stmt->execute()) {
                 echo "Assignment uploaded successfully!";
