@@ -142,7 +142,7 @@ function getNextClassNumber($conn) {
             <div class="form-label">Class Description (ie. Senior Capstone Project):</div>
             <input type="text" name="classDesc" required>
 
-            <input type="submit" value="Upload Assignment" class="button">
+            <input type="submit" value="Create Class" class="button">
         </form>
     </div>
 </body>

@@ -32,7 +32,7 @@ if (isset($_SESSION["role"]) && $_SESSION["role"] === 'teacher') {
             $stmt->bind_param("isssi", $classNumber, $classTitle, $classDesc, $classSemester, $teacherID);
 
             if ($stmt->execute()) {
-                echo "Assignment uploaded successfully!";
+                echo "Class created successfully!";
             } else {
                 echo "Error uploading assignment: " . $stmt->error;
             }
