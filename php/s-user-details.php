@@ -61,7 +61,27 @@ function get_full_name($user_name, $conn) {
     return $values["REAL_NAME"];
 }
 
+function get_email($user_name, $conn) {
+    $stmt = $conn->prepare("SELECT EMAIL FROM STUDENT_USER WHERE USER_NAME = ?;");
+    $stmt->bind_param("s", $user_name);
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows == 0) {
+        die("No user with name " . $user_name);
+    } elseif ($result->num_rows > 1) {
+        die("Duplicate users with name " . $user_name);
+    }
+
+    $values = $result->fetch_assoc();
+    if (!isset($values["EMAIL"]))
+        return '';
+
+    return $values["EMAIL"];
+}
+
 $full_name = get_full_name($user_name, $conn);
+$email = get_email($user_name, $conn);
 ?>
 <!DOCTYPE html>
 <html>
@@ -177,6 +197,11 @@ $full_name = get_full_name($user_name, $conn);
             <?php if ($full_name != '') { ?>
                 <p>
                     Your real name is <span class="bold"><?php echo($full_name) ?></span>.<br>
+                </p>
+            <?php } ?>
+            <?php if ($email != '') { ?>
+                <p>
+                    Your email address is <?= $email ?>.
                 </p>
             <?php } ?>
             <p>
