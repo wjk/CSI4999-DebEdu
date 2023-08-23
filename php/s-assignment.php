@@ -158,19 +158,28 @@ function get_assignment_number($conn, $student_id) {
         ?>
     </tbody>
 </table>
-    <select name="number"> 
-    <?php 
-        $max_number = get_assignment_number($conn, get_student_id($conn, $_SESSION["username"]));
-        for($i = 1; $i <= $max_number; $i++) {
-            echo "<option value=\"$i\">$i</option>";
-        }
-        ?>
-    </select>
     <h3 class="sub-header">Submit Assignment</h3>
     <form action="submit_assignment.php" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" required>
-    <input type="submit" value="Submit Assignment">
-</form>
+        <p>
+            <label for="number">Assignment number:</label>
+            <select name="assignment_id"> 
+                <?php 
+                    $max_number = get_assignment_number($conn, get_student_id($conn, $_SESSION["username"]));
+                    for($i = 1; $i <= $max_number; $i++) {
+                        echo "<option value=\"$i\">$i</option>";
+                    }
+                ?>
+            </select>
+        </p>
+
+        <p>
+            <input type="file" name="file" required>
+        </p>
+
+        <p>
+            <input type="submit" value="Submit Assignment">
+        </p>
+    </form>
     <button class="button" id="back">Back</button>
 </div>
 
