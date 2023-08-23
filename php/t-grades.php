@@ -126,6 +126,9 @@ function get_class_data($conn, $teacher_id) {
             border-collapse: collapse;
             margin-bottom: 30px;
         }
+        table tbody tr {
+            cursor: pointer;
+        }
         th, td {
             border: 1px solid black;
             padding: 8px;
@@ -219,6 +222,13 @@ function get_class_data($conn, $teacher_id) {
         window.onload = function() {
             document.getElementById('back').addEventListener('click', function(event) {
                 window.location.href = "teacher.php";
+            });
+            var rows = document.querySelectorAll('table tbody tr');
+            rows.forEach(function(row) {
+                row.addEventListener('click', function() {
+                    var assignmentId = this.getAttribute('data-id');
+                    window.location.href = `assignment-detail.php?id=${assignmentId}`;
+                });
             });
         };
         var preloadedClass = <?php echo json_encode(get_classes($conn, get_teacher_id($conn, $_SESSION["username"]))); ?>;
