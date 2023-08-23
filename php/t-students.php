@@ -104,7 +104,6 @@ function get_classes($conn, $teacher_id) {
         }
 
         .choice-container {
-            width: 500px;
             padding: 16px;
             background-color: white;
             border-radius: 8px;
