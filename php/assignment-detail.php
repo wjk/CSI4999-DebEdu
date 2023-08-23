@@ -26,7 +26,7 @@ $stmt->execute();
 $assignment = $stmt->get_result()->fetch_assoc();
 
 // Fetch students associated with this assignment
-$stmt = $conn->prepare("SELECT STUDENT_USER.USER_NUMBER, STUDENT_USER.REAL_NAME, ASSIGNMENT_FOR_CLASS.GRADE 
+$stmt = $conn->prepare("SELECT STUDENT_USER.USER_NUMBER, STUDENT_USER.REAL_NAME, ASSIGNMENT_FOR_CLASS.GRADE, ASSIGNMENT_FOR_CLASS.ASSIGNMENT_NUMBER
                         FROM ASSIGNMENT_FOR_CLASS 
                         JOIN STUDENT_USER ON ASSIGNMENT_FOR_CLASS.STUDENT_NUMBER = STUDENT_USER.USER_NUMBER
                         WHERE ASSIGNMENT_FOR_CLASS.ASSIGNMENT_NUMBER = ?");
@@ -116,6 +116,7 @@ function get_teacher_id($conn, $user_name) {
             <input type="text" name="classTitle" value="<?= $assignment['TITLE'] ?>" readonly>
            <div class="form-label">Assignment Description:</div>
             <input type="text" name="classTitle" value="<?= $assignment['DESCRIPTION'] ?>" readonly>
+            <input type="hidden" name="assignmentId" value="<?= $assignment['ASSIGNMENT_NUMBER'] ?>">
 <table>
             <thead>
                 <tr>

@@ -19,12 +19,13 @@ function get_teacher_id($conn, $user_name) {
 // Check if the user is a teacher
 if (isset($_POST['studentGrades'])) {
     $grades = $_POST['studentGrades'];
+    $assignmentId = $_POST['assignmentId'];
 
     foreach ($grades as $studentId => $grade) {
             // Insert assignment into the database
             $updateQuery = "UPDATE ASSIGNMENT_FOR_CLASS SET GRADE = ? WHERE STUDENT_NUMBER = ? AND ASSIGNMENT_NUMBER = ?";
             $stmt = $conn->prepare($updateQuery);
-            $stmt->bind_param("sii", $grade, $studentId, $assignmentId);
+            $stmt->bind_param("iii", $grade, $studentId, $assignmentId);
 
             if ($stmt->execute()) {
                 echo "Assignment graded successfully!";
