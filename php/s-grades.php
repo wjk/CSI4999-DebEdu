@@ -86,7 +86,6 @@ function get_student_semesters($conn, $student_id) {
         }
 
         .choice-container {
-            width: 350px;
             padding: 16px;
             background-color: white;
             border-radius: 8px;
