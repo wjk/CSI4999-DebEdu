@@ -98,13 +98,11 @@ function get_real_name($conn, $user_name) {
 <body>
     <div class="choice-container">
         <h1 class ="header">Teacher Portal</h1>
-        <h2 class ="header-2">Welcome, <?= get_real_name($conn, $_SESSION["username"]) ?></h1>
+        <h2 class ="header-2">Welcome, <?= get_real_name($conn, $_SESSION["username"]) ?></h1> 
+        <button class="button" id = "schedule">Schedule</button>
         <button class="button" id="assignments">Assignments</button>
         <button class="button" id = "grades">Submit Grades</button>
-
         <button class="button" id = "students">Students</button>
-        <button class="button" id = "more">More</button>
-
         <a href="t-user-details.php">Your Account</a><br>
         <a href="logout.php">Log Out</a>
     </div>
@@ -120,8 +118,8 @@ function get_real_name($conn, $user_name) {
             document.getElementById('assignments').addEventListener('click', function(event) {
                 window.location.href = "t-assignment.php";
             });
-            document.getElementById('more').addEventListener('click', function(event) {
-                window.location.href = "t-more.php";
+            document.getElementById('schedule').addEventListener('click', function(event) {
+                window.location.href = "t-schedule.php";
             });
         };
     </script>
