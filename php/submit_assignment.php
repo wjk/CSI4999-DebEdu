@@ -25,36 +25,29 @@ function get_student_id($conn, $user_name) {
 if (isset($_POST['assignment_id'])) {
     $student_id = get_student_id($conn, $_SESSION["username"]);
     $assignment_id = $_POST['assignment_id'];
+    $filename = $_FILES["file"]["tmp_path"];
 
-    // Handle file upload
-    $target_dir = "uploads/"; // Specify the directory to store uploaded files
-    $target_file = $target_dir . basename($_FILES["file"]["name"]);
+    if (empty($file)) {
+        header("HTTP/1.1 500 Internal Server Error");
+        echo "No file selected for upload";
+        exit;
+    }
 
-    if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
-        $fp = fopen($target_file, 'r');
-        $content = '';
-        if (filesize($target_file) > 0) {
-            $content = fread($fp, filesize($target_file));
-        }
-        fclose($fp);
+    $content = file_get_contents($file);
+    // Insert submission record into the database
+    $insertQuery = "INSERT INTO ASSIGNMENT_FOR_CLASS (STUDENT_NUMBER, ASSIGNMENT_NUMBER, GRADE, SUBMISSION) VALUES (?, ?, 0, ?);";
+    $stmt = $conn->prepare($insertQuery);
+    $stmt->bind_param("bii", $student_id, $assignment_id, $content);
 
-        // Insert submission record into the database
-        $insertQuery = "UPDATE ASSIGNMENT_FOR_CLASS SET SUBMISSION = ? WHERE STUDENT_NUMBER = ? AND ASSIGNMENT_NUMBER = ?;";
-        $stmt = $conn->prepare($insertQuery);
-        $stmt->bind_param("bii", $content, $student_id, $assignment_id);
-
-        if ($stmt->execute()) {
-            echo "Assignment submitted successfully!";
-        } else {
-            echo "Error submitting assignment.";
-        }
+    if ($stmt->execute()) {
+        echo "Assignment submitted successfully!";
     } else {
-        echo "Error uploading file.";
+        header("HTTP/1.1 500 Internal Server Error");
+        echo "Error submitting assignment.";
     }
 } else {
     header("HTTP/1.1 500 Internal Server Error");
-    echo "assignment_id parameter not set";
-    print_r($_POST);
+    echo "Error uploading file.";
     exit;
 }
 
