@@ -35,7 +35,11 @@ function get_teacher_id($conn, $user_name) {
 // Get Semester information
 function get_semesters($conn, $teacher_id) {
     $stmt = $conn->prepare(
-        "SELECT DISTINCT SEMESTER FROM EDU_CLASS WHERE TEACHER_NUMBER = ? ORDER BY SEMESTER DESC"
+        "SELECT DISTINCT EDU_CLASS.SEMESTER 
+        FROM EDU_CLASS 
+        INNER JOIN STUDENT_IN_CLASS ON STUDENT_IN_CLASS.CLASS_NUMBER = EDU_CLASS.CLASS_NUMBER
+        WHERE TEACHER_NUMBER = ? 
+        ORDER BY SEMESTER DESC"
     );
     $stmt->bind_param("i", $teacher_id);
     $stmt->execute();
@@ -51,11 +55,8 @@ function get_student_data($conn, $teacher_id) {
     $stmt = $conn->prepare(
         "SELECT EDU_CLASS.TITLE, EDU_CLASS.SEMESTER, STUDENT_USER.EMAIL, STUDENT_USER.REAL_NAME, STUDENT_IN_CLASS.GRADE 
         FROM EDU_CLASS
-        -- Left join as some data may not be present ie. EMAIL
-        LEFT JOIN ASSIGNMENT ON ASSIGNMENT.CLASS_NUMBER = EDU_CLASS.CLASS_NUMBER
-        LEFT JOIN ASSIGNMENT_FOR_CLASS ON ASSIGNMENT_FOR_CLASS.ASSIGNMENT_NUMBER = ASSIGNMENT.ASSIGNMENT_NUMBER
-        LEFT JOIN STUDENT_USER ON STUDENT_USER.USER_NUMBER = ASSIGNMENT_FOR_CLASS.STUDENT_NUMBER
-        LEFT JOIN STUDENT_IN_CLASS ON STUDENT_IN_CLASS.STUDENT_NUMBER = STUDENT_USER.USER_NUMBER AND STUDENT_IN_CLASS.CLASS_NUMBER = EDU_CLASS.CLASS_NUMBER
+        INNER JOIN STUDENT_IN_CLASS ON STUDENT_IN_CLASS.CLASS_NUMBER = EDU_CLASS.CLASS_NUMBER
+        INNER JOIN STUDENT_USER ON STUDENT_USER.USER_NUMBER = STUDENT_IN_CLASS.STUDENT_NUMBER
         WHERE EDU_CLASS.TEACHER_NUMBER = ?"
     );
     $stmt->bind_param("i", $teacher_id);
@@ -70,9 +71,10 @@ function get_student_data($conn, $teacher_id) {
 // Get all class titles for the semesters the teacher is teaching in
 function get_classes($conn, $teacher_id) {
     $stmt = $conn->prepare( 
-        "SELECT TITLE , SEMESTER
+        "SELECT DISTINCT EDU_CLASS.TITLE, EDU_CLASS.SEMESTER
         FROM EDU_CLASS 
-        WHERE TEACHER_NUMBER = ?"
+        INNER JOIN STUDENT_IN_CLASS ON STUDENT_IN_CLASS.CLASS_NUMBER = EDU_CLASS.CLASS_NUMBER
+        WHERE EDU_CLASS.TEACHER_NUMBER = ?"
     );
     $stmt->bind_param("i", $teacher_id);
     $stmt->execute();
@@ -172,7 +174,7 @@ function get_classes($conn, $teacher_id) {
         <h1 class ="header">Teacher Portal</h1>
         <h3 class ="sub-header">Students View</h3>
         <!-- Semester selection -->
-    <select id="selection"onchange="filter();"><option value="All" selected>All</option>
+    <select id="selection"onchange="applyFilters();"><option value="All" selected>All</option>
     <?php
         // Call Function for array of semester associated with teacher ID
         $semesters = get_semesters($conn, get_teacher_id($conn, $_SESSION["username"])); 
@@ -182,7 +184,7 @@ function get_classes($conn, $teacher_id) {
         }
     ?>
 </select>
-<select id="classSelection"onchange="refilter();"style="display:none;"><option value="All" selected>All</option>
+<select id="classSelection"onchange="applyFilters();"style="display:none;"><option value="All" selected>All</option>
 </select>
         <table>
             <thead>
@@ -217,28 +219,32 @@ function get_classes($conn, $teacher_id) {
 
     <script>
         // Get all classes associated with the teacher
+        
         var preloadedClass = <?php echo json_encode(get_classes($conn, get_teacher_id($conn, $_SESSION["username"]))); ?>;
-
-        function filter() {
-            //Get selected semester and class selection
+        function applyFilters() {
             var selectedSemester = document.getElementById('selection').value;
+            var selectedClass = document.getElementById('classSelection').value;
             var classDropdown = document.getElementById('classSelection');
-            // Clear class drop down to re-enter values
+
             var options = classDropdown.querySelectorAll('option');
             for (var i = 1; i < options.length; i++) {  // Starting from index 1 to skip the first option ("ALL")
                 classDropdown.removeChild(options[i]);
             }
 
-            //Get table data
+
+
+
+
             var rows = document.querySelectorAll('table tbody tr');
-            //Loop through table data
+
             rows.forEach(function(row) {
-                //Selects 'last-child' which is the semester column in each row
-                var semester = row.querySelector('td:last-child');
-                //Display all if all is selected or display only the rows that = the selected semester
-                if (selectedSemester === 'All' || semester.innerText === selectedSemester) {
+                var semester = row.querySelector('td:last-child').innerText;
+                var classes = row.querySelector('td:nth-child(4)').innerText;
+                var semesterMatch = selectedSemester === 'All' || semester === selectedSemester;
+                var classMatch = selectedClass === 'All' || classes === selectedClass;
+
+                if (semesterMatch && classMatch) {
                     row.style.display = '';
-                    //Otherwise we do not display the row
                 } else {
                     row.style.display = 'none';
                 }
@@ -253,6 +259,9 @@ function get_classes($conn, $teacher_id) {
                         var option = document.createElement('option');
                         option.value = row.TITLE; 
                         option.textContent = row.TITLE;
+                        if (row.TITLE === selectedClass) {
+                            option.selected = true;
+                        }
                         classDropdown.appendChild(option);
                     });
                     classDropdown.style.display = '';
@@ -260,29 +269,6 @@ function get_classes($conn, $teacher_id) {
                  else {
                     classDropdown.style.display = 'none';
                 }
-        }
-
-        function refilter() {
-            var selectedSemester = document.getElementById('selection').value;
-            var selectedClass = document.getElementById('classSelection').value;
-            console.log(selectedClass);
-
-            //Get table data
-            var rows = document.querySelectorAll('table tbody tr');
-            //Loop through table data
-            rows.forEach(function(row) {
-                //Selects 'last-child' which is the semester column in each row
-                var semester = row.querySelector('td:last-child');
-                var classes = row.querySelector('td:nth-child(4)');
-                console.log(classes);
-                //Display all if all is selected or display only the rows that = the selected semester
-                if ((selectedClass === 'All' && semester.innerText === selectedSemester) || classes.innerText === selectedClass) {
-                    row.style.display = '';
-                    //Otherwise we do not display the row
-                } else {
-                    row.style.display = 'none';
-                }
-            });
         }
     </script>
     <script>
