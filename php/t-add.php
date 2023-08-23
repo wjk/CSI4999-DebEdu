@@ -121,6 +121,16 @@ function get_teacher_id($conn, $user_name) {
 
             <input type="submit" value="Add to Class" class="button">
         </form>
+        <div class="button-container">
+        <button class="button" id = "back">Back</button>
     </div>
+    </div>
+    <script>
+        window.onload = function() {
+            document.getElementById('back').addEventListener('click', function(event) {
+                window.location.href = "t-schedule.php";
+            });
+        };
+        </script>
 </body>
 </html>
