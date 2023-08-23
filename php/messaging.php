@@ -232,7 +232,7 @@ function sort_messages($messages) {
             $user_date = month_number_to_month_name($post_month) . ' ' . $post_day . ', ' . $post_year;
         }
 
-        $user_time = $post_time->format("g:m A");
+        $user_time = $post_time->format("g:i A");
         $output_msg["date_string"] = $user_date .  ' at ' . $user_time;
 
         $result[] = $output_msg;
