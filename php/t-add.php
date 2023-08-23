@@ -48,6 +48,40 @@ function get_teacher_id($conn, $user_name) {
     return $row["USER_NUMBER"];
 }
 
+function get_all_students($conn) {
+    $stmt = $conn->prepare("SELECT USER_NUMBER, REAL_NAME FROM STUDENT_USER;");
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $students = [];
+    while ($row = $result->fetch_assoc()) {
+        $students[] = $row;
+    }
+
+    return $students;
+}
+
+function get_classes($conn, $teacher_id) {
+    $stmt = $conn->prepare(
+        "SELECT CLASS_NUMBER, DESCRIPTION, TITLE, SEMESTER " .
+        "FROM EDU_CLASS " .
+        "WHERE TEACHER_NUMBER = ?"
+    );
+    $stmt->bind_param("i", $teacher_id);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $classes = [];
+    while ($row = $result->fetch_assoc()) {
+        $classes[] = $row;
+    }
+
+    return $classes;
+}
+
+$user_name = $_SESSION['username'];
+$teacher_id = get_teacher_id($conn, $user_name);
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -116,11 +150,25 @@ function get_teacher_id($conn, $user_name) {
     <div class="choice-container">
         <h1 class="header">Add Student to Class</h1>
         <form action="add_student.php" method="post" enctype="multipart/form-data">
-            <div class="form-label">Class Number:</div>
-            <input type="text" name="classNumber" required>
+            <label for="classNumber" class="form-label">Class:</label>
+            <select id="classNumber">
+                <?php
+                $classes = get_classes($conn, $teacher_id);
+                foreach ($classes as $class) {
+                    echo "<option value=\"" . $class['CLASS_NUMBER'] . "\">" . $class['TITLE'] . " (" . $class['SEMESTER'] . ")</option>";
+                }
+                ?>
+            </select>
 
-            <div class="form-label">Student Number:</div>
-            <input type="text" name="studentNumber" required>
+            <label for="studentNumber" class="form-label">Student:</label>
+            <select id="studentNumber">
+                <?php
+                $students = get_all_students($conn);
+                foreach ($students as $student) {
+                    echo "<option value=\"" . $student['USER_NUMBER'] . "\">" . $student['REAL_NAME'] . "</option>";
+                }
+                ?>
+            </select>
 
             <input type="submit" value="Add to Class" class="button">
         </form>
