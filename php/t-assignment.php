@@ -15,6 +15,16 @@ if (isset($_SESSION["role"])) {
     exit;
 }
 
+function userNumberFromUserName($conn, $username) {
+    $stmt = $conn->prepare("SELECT USER_NUMBER FROM TEACHER_USER WHERE USER_NAME = ?;");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $values = $result->fetch_assoc();
+    return $values['USER_NUMBER'];
+}
+
 function getNextAssignmentNumber($conn) {
     $query = "SELECT MAX(ASSIGNMENT_NUMBER) AS max_assignment_number FROM ASSIGNMENT";
     $result = $conn->query($query);
@@ -97,7 +107,7 @@ function getNextAssignmentNumber($conn) {
             <select name="classNumber">
                 <?php
                 // Fetch classes taught by the teacher
-                $teacherNumber = $_SESSION["USER_NUMBER"];
+                $teacherNumber = userNumberFromUserName($conn, $_SESSION['username']);
                 $classQuery = "SELECT CLASS_NUMBER, TITLE FROM EDU_CLASS WHERE TEACHER_NUMBER = ?";
                 $stmt = $conn->prepare($classQuery);
                 $stmt->bind_param("i", $teacherNumber);
