@@ -134,7 +134,7 @@ function get_assignment_number($conn, $student_id) {
 <body>
 <div class="choice-container">
     <h1 class="header">Student Portal</h1>
-    <h3 class="sub-header">Grade View</h3>
+    <h3 class="sub-header">Assignment Submission</h3>
 
     <!-- Displaying class titles, descriptions, and grades -->
     <table>
@@ -166,10 +166,10 @@ function get_assignment_number($conn, $student_id) {
         }
         ?>
     </select>
-    <h3 class="sub-header">Select submission file:</h3>
-    <form action="upload.php" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" id="upload">
-    <button type="submit" name="submit">UPLOAD</button>
+    <h3 class="sub-header">Submit Assignment</h3>
+    <form action="submit_assignment.php" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <input type="submit" value="Submit Assignment">
 </form>
     <button class="button" id="back">Back</button>
 </div>
