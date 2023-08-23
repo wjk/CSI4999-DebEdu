@@ -151,7 +151,7 @@ $teacher_id = get_teacher_id($conn, $user_name);
         <h1 class="header">Add Student to Class</h1>
         <form action="add_student.php" method="post" enctype="multipart/form-data">
             <label for="classNumber" class="form-label">Class:</label>
-            <select id="classNumber">
+            <select name="classNumber">
                 <?php
                 $classes = get_classes($conn, $teacher_id);
                 foreach ($classes as $class) {
@@ -161,7 +161,7 @@ $teacher_id = get_teacher_id($conn, $user_name);
             </select>
 
             <label for="studentNumber" class="form-label">Student:</label>
-            <select id="studentNumber">
+            <select name="studentNumber">
                 <?php
                 $students = get_all_students($conn);
                 foreach ($students as $student) {
