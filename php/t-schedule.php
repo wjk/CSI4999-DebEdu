@@ -184,6 +184,7 @@ function get_class_data($conn, $teacher_id) {
         <div class="button-container">
         <button class="button" id = "back">Back</button>
         <button class="button" id = "create">Create Class</button>
+        <button class="button" id = "student">Add Students</button>
 
     </div>
     </div>
@@ -194,6 +195,11 @@ function get_class_data($conn, $teacher_id) {
             });
                 document.getElementById('create').addEventListener('click', function(event) {
                 window.location.href = "t-create.php";
+                
+            });
+            document.getElementById('student').addEventListener('click', function(event) {
+                window.location.href = "t-add.php";
+                
             });
         };
         var preloadedClass = <?php echo json_encode(get_classes($conn, get_teacher_id($conn, $_SESSION["username"]))); ?>;
