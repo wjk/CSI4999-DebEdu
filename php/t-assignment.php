@@ -14,6 +14,20 @@ if (isset($_SESSION["role"])) {
     header("Location: login.php");
     exit;
 }
+
+function getNextAssignmentNumber($conn) {
+    $query = "SELECT MAX(ASSIGNMENT_NUMBER) AS max_assignment_number FROM ASSIGNMENT";
+    $result = $conn->query($query);
+    
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $nextAssignmentNumber = $row['max_assignment_number'] + 1;
+        return $nextAssignmentNumber;
+    } else {
+        return 1; // Default if no assignments exist yet
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -31,53 +45,47 @@ if (isset($_SESSION["role"])) {
         }
 
         .choice-container {
-            width: 400px; /* Increased container width for better alignment */
+            width: 400px;
             padding: 16px;
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1); 
-            text-align: center; /* Center align all contents */
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
         }
+
         .header {
             color: #5c6bc0;
             font-size: 24px;
             font-weight: bold;
-            margin-bottom: 10px; /* Added margin for separation */
+            margin-bottom: 10px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px; /* Reduced margin for spacing */
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
+
         .form-label {
             text-align: left;
             color: #5c6bc0;
+            font-size: 14px;
             margin-bottom: 5px;
-            font-size: 12px;
         }
-        .input-field {
+
+        select, input[type="file"] {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            margin-bottom: 10px;
         }
+
         .button {
-            font-size: 12px;
-            background-color: #7885d1;
+            font-size: 14px;
+            background-color: #5c6bc0;
             color: white;
             border-radius: 10px;
             border: none;
-            width: 100px; /* Adjusted button width */
+            width: 100%;
             height: 40px;
-            margin-top: 10px; /* Moved margin to top for spacing */
         }
+
         .button:hover {
-            background-color: #5c6bc0;
+            background-color: #36448f;
         }
     </style>
 </head>
@@ -88,11 +96,8 @@ if (isset($_SESSION["role"])) {
             <div class="form-label">Select Class:</div>
             <select name="classNumber">
                 <?php
-                include('common/mysql-connect.php');
-                $conn = connect_to_database();
-
                 // Fetch classes taught by the teacher
-                $teacherNumber = $_SESSION["userNumber"];
+                $teacherNumber = $_SESSION["USER_NUMBER"];
                 $classQuery = "SELECT CLASS_NUMBER, TITLE FROM EDU_CLASS WHERE TEACHER_NUMBER = ?";
                 $stmt = $conn->prepare($classQuery);
                 $stmt->bind_param("i", $teacherNumber);
@@ -106,20 +111,13 @@ if (isset($_SESSION["role"])) {
                 $stmt->close();
                 ?>
             </select>
-            
+            <div class="form-label">Assignment Number:</div>
+            <input type="text" name="assignmentNumber" value="<?php echo getNextAssignmentNumber($conn); ?>" readonly>
 
             <div class="form-label">Upload Assignment:</div>
             <input type="file" name="file" required>
-
             <input type="submit" value="Upload Assignment" class="button">
         </form>
     </div>
-    <script>
-        window.onload = function() {
-            document.getElementById('back').addEventListener('click', function(event) {
-                window.location.href = "teacher.php";
-            });
-        };
-    </script>
 </body>
 </html>
