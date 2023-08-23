@@ -35,9 +35,9 @@ if (isset($_POST['assignment_id'])) {
 
     $content = file_get_contents($filename);
     // Insert submission record into the database
-    $insertQuery = "INSERT INTO ASSIGNMENT_FOR_CLASS (STUDENT_NUMBER, ASSIGNMENT_NUMBER, GRADE, SUBMISSION) VALUES (?, ?, 0, ?);";
+    $insertQuery = "UPDATE ASSIGNMENT_FOR_CLASS SET SUBMISSION = ? WHERE ASSIGNMENT_NUMBER = ? AND STUDENT_NUMBER = ?;";
     $stmt = $conn->prepare($insertQuery);
-    $stmt->bind_param("iib", $student_id, $assignment_id, $content);
+    $stmt->bind_param("bii", $content, $student_id, $assignment_id);
 
     if ($stmt->execute()) {
         echo "Assignment submitted successfully!";
