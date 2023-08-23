@@ -8,8 +8,8 @@ $conn = connect_to_database();
 if (isset($_SESSION["role"]) && $_SESSION["role"] === 'teacher') {
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Process the assignment upload
-        $assignmentNumber = $_POST['$assignmentNumber'];
-        $classNumber = $_SESSION["classNumber"]; // You need to set the class number somehow
+        $assignmentNumber = $_POST['assignmentNumber'];
+        $classNumber = $_POST["classNumber"];
         $datePosted = date("Y-m-d H:i:s");
         $file = $_FILES["file"]["tmp_name"];
 
