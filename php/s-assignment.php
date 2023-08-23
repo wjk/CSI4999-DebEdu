@@ -64,6 +64,8 @@ function get_assignment_number($conn, $student_id) {
     return $row["max_num"];
 }
 
+$seen_open_assignment = false;
+
 ?>
 <!DOCTYPE html> 
 <html>
@@ -154,10 +156,13 @@ function get_assignment_number($conn, $student_id) {
                 <td><?= $assignment["ASSIGNMENT_NUMBER"] ?></td>
                 <td><?= $assignment["Submission"] ?></td>
             </tr>
-        <?php }
+        <?php
+            if ($assignment["Submission"] == 'N') { $seen_open_assignment = true; }
+        }
         ?>
     </tbody>
 </table>
+<?php if ($seen_open_assignment) { ?>
     <h3 class="sub-header">Submit Assignment</h3>
     <form action="submit_assignment.php" method="POST" enctype="multipart/form-data">
         <p>
@@ -180,6 +185,9 @@ function get_assignment_number($conn, $student_id) {
             <input type="submit" value="Submit Assignment">
         </p>
     </form>
+<?php } else { ?>
+    <h3 class="sub-header">No assignments are open.</h3>
+<?php } ?>
     <button class="button" id="back">Back</button>
 </div>
 
