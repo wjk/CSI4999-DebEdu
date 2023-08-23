@@ -128,6 +128,7 @@ $classes = get_all_classes($conn, $user_name);
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            overflow-y: auto; 
         }
         .header {
             text-align: center;

@@ -277,6 +277,8 @@ $class_title = get_class_title($conn, $class_number);
             flex-direction: column;
             align-items: center;
             margin: 10px;
+            overflow-y: auto; 
+
         }
         .header {
             text-align: center;
