@@ -25,19 +25,19 @@ function get_student_id($conn, $user_name) {
 if (isset($_POST['assignment_id'])) {
     $student_id = get_student_id($conn, $_SESSION["username"]);
     $assignment_id = $_POST['assignment_id'];
-    $filename = $_FILES["file"]["tmp_path"];
+    $filename = $_FILES["file"]["tmp_name"];
 
-    if (empty($file)) {
+    if (empty($filename)) {
         header("HTTP/1.1 500 Internal Server Error");
         echo "No file selected for upload";
         exit;
     }
 
-    $content = file_get_contents($file);
+    $content = file_get_contents($filename);
     // Insert submission record into the database
     $insertQuery = "INSERT INTO ASSIGNMENT_FOR_CLASS (STUDENT_NUMBER, ASSIGNMENT_NUMBER, GRADE, SUBMISSION) VALUES (?, ?, 0, ?);";
     $stmt = $conn->prepare($insertQuery);
-    $stmt->bind_param("bii", $student_id, $assignment_id, $content);
+    $stmt->bind_param("iib", $student_id, $assignment_id, $content);
 
     if ($stmt->execute()) {
         echo "Assignment submitted successfully!";

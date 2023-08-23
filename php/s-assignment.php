@@ -65,6 +65,7 @@ function get_assignment_number($conn, $student_id) {
 }
 
 $seen_open_assignment = false;
+$open_assigments = [];
 
 ?>
 <!DOCTYPE html> 
@@ -157,7 +158,10 @@ $seen_open_assignment = false;
                 <td><?= $assignment["Submission"] ?></td>
             </tr>
         <?php
-            if ($assignment["Submission"] == 'N') { $seen_open_assignment = true; }
+            if ($assignment["Submission"] == 'N') {
+                $seen_open_assignment = true;
+                $open_assigments[] = $assignment;
+            }
         }
         ?>
     </tbody>
@@ -168,10 +172,11 @@ $seen_open_assignment = false;
         <p>
             <label for="number">Assignment number:</label>
             <select name="assignment_id"> 
-                <?php 
-                    $max_number = get_assignment_number($conn, get_student_id($conn, $_SESSION["username"]));
-                    for($i = 1; $i <= $max_number; $i++) {
-                        echo "<option value=\"$i\">$i</option>";
+                <?php
+                    foreach ($open_assigments as $assignment) {
+                        $assignment_number = $assignment['ASSIGNMENT_NUMBER'];
+                        $title = $assignment['TITLE'];
+                        echo "<option value=\"$assignment_number\">$title $assignment_number</option>";
                     }
                 ?>
             </select>
